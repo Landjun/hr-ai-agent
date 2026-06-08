@@ -20,6 +20,7 @@ class LLMClient:
     def __init__(self) -> None:
         self.offline = settings.offline_mode
         self._client = None
+        self.last_error: Optional[str] = None  # 最近一次真实调用失败信息（供 UI 提示）
         if not self.offline:
             try:
                 from openai import OpenAI
@@ -52,7 +53,14 @@ class LLMClient:
         payload = payload or {}
         if self.offline:
             return mock_llm.generate(task, payload)
-        return self._chat(system, user)
+        try:
+            return self._chat(system, user)
+        except Exception as exc:
+            # 真实大模型调用失败（余额不足 402 / 超时 / 网络等）：
+            # 不让异常冒泡崩溃页面，本次自动降级为离线 Mock，保证流程跑完。
+            self.last_error = f"{type(exc).__name__}: {exc}"
+            print(f"[LLMClient] 真实大模型调用失败，本次降级离线 Mock：{self.last_error}")
+            return mock_llm.generate(task, payload)
 
     def _chat(self, system: str, user: str) -> str:
         assert self._client is not None

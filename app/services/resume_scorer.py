@@ -14,16 +14,42 @@ from app.utils.json_parser import parse_json
 from app.utils.scoring import clamp_dimension_scores
 
 
+# 岗位类别关键词：用于「模糊匹配」评分规则，避免要求岗位名一字不差。
+# 越靠前越具体，命中后优先选用。
+ROLE_KEYWORDS = ["产品经理", "项目经理", "算法工程师", "数据分析师",
+                 "工程师", "运营", "设计师", "开发"]
+
+
+def resolve_ruleset_title(job_title: str) -> str:
+    """把任意 JD 岗位名解析到一套已存在的评分规则岗位名。
+
+    1) 精确命中 → 用它；
+    2) 否则按「岗位类别关键词」模糊匹配（如『AI高级产品经理』→『医疗AI产品经理』，
+       因为都含『产品经理』）；
+    3) 都不中 → 回退『通用』。
+    """
+    job_title = (job_title or "").strip()
+    with session_scope() as session:
+        all_titles = list(session.exec(
+            select(ScoringRule.job_title).distinct()).all())
+    if job_title in all_titles:
+        return job_title
+    custom = [t for t in all_titles if t and t != "通用"]
+    for kw in ROLE_KEYWORDS:  # 已按具体度排序
+        if kw in job_title:
+            for t in custom:
+                if kw in t:
+                    return t
+    return "通用"
+
+
 def get_scoring_dimensions(job_title: str = "通用") -> List[Dict[str, Any]]:
-    """读取评分规则维度（优先岗位专属，回退通用）。"""
+    """读取评分规则维度（精确→按岗位类别模糊匹配→回退通用）。"""
+    resolved = resolve_ruleset_title(job_title)
     with session_scope() as session:
         rules = session.exec(
-            select(ScoringRule).where(ScoringRule.job_title == job_title)
+            select(ScoringRule).where(ScoringRule.job_title == resolved)
         ).all()
-        if not rules:
-            rules = session.exec(
-                select(ScoringRule).where(ScoringRule.job_title == "通用")
-            ).all()
         return [
             {"dimension": r.dimension, "max_score": r.max_score,
              "sub_dimension": r.sub_dimension, "description": r.description}

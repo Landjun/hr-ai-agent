@@ -51,11 +51,19 @@ def job_label(j: Job) -> str:
 
 
 def llm_banner():
+    llm = get_llm()
     if settings.offline_mode:
         st.info(f"🤖 当前为**离线 Mock 模式**（未配置 API Key），用内置规则模拟大模型，"
                 f"流程完整可演示。配置 `.env` 中 `LLM_API_KEY` 即可切换真实大模型。", icon="ℹ️")
     else:
-        st.success(f"🤖 已接入真实大模型：{get_llm().mode}", icon="✅")
+        st.success(f"🤖 已接入真实大模型：{llm.mode}", icon="✅")
+    if getattr(llm, "last_error", None):
+        st.warning(
+            f"⚠️ 真实大模型上次调用失败，已**自动降级为离线 Mock**（结果由内置规则生成）。\n\n"
+            f"错误：`{llm.last_error}`\n\n"
+            f"若是 `Insufficient Balance`（余额不足），请给 API 账户充值；"
+            f"或清空 `.env` 的 `LLM_API_KEY` 明确使用离线模式。修复后请重启网页。",
+            icon="⚠️")
 
 
 # ----------------------------- 侧边栏 -----------------------------
