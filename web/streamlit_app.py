@@ -146,10 +146,20 @@ if PAGE.startswith("①"):
     c1.metric("已上传 JD", n_jobs)
     c2.metric("已上传简历", n_res)
     c3.metric("已完成筛选", n_app)
-    from app.models import InterviewSession
+    from app.models import Application, InterviewSession
     with Session(engine) as s:
         n_int = s.exec(select(func.count()).select_from(InterviewSession)).one()
+        apps = s.exec(select(Application)).all()
     c4.metric("已完成面试", n_int)
+
+    if apps:
+        order = ["强烈推荐面试", "建议面试", "备选", "暂不推荐"]
+        counts = {k: 0 for k in order}
+        for a in apps:
+            counts[a.level] = counts.get(a.level, 0) + 1
+        cdf = pd.DataFrame({"人数": [counts.get(k, 0) for k in order]}, index=order)
+        st.markdown("**候选人推荐等级分布**")
+        st.bar_chart(cdf, height=240, color="#2563eb")
 
     st.divider()
     st.subheader("使用建议流程")
@@ -409,7 +419,9 @@ elif PAGE.startswith("⑤"):
                 st.rerun()
     else:
         # 进行中
-        st.caption(f"会话 #{ss.mock_session_id}　共 {ss.mock_max} 题")
+        _answered = len(ss.get("mock_history", []))
+        st.caption(f"会话 #{ss.mock_session_id}　进度 {min(_answered + (0 if ss.get('mock_finished') else 1), ss.mock_max)}/{ss.mock_max} 题")
+        st.progress(min(1.0, _answered / ss.mock_max if ss.mock_max else 0))
         for h in ss.get("mock_history", []):
             with st.chat_message("assistant"):
                 st.markdown(f"**第 {h['index']} 题（{h['dimension']}）**：{h['question']}")

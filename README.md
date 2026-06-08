@@ -28,6 +28,15 @@
 - [单人初筛报告（分维度+证据+风险+建议面试题）](docs/examples/screening_report_sample.md)
 - [AI 模拟面试报告（分维度+每题复盘+7天提升计划）](docs/examples/interview_report_sample.md)
 
+## 🖼️ 界面预览
+
+> 截图占位：本地运行后把截图保存到 [`docs/screenshots/`](docs/screenshots/)（命名见该目录说明），
+> 再取消下面注释即可在此展示。推荐 3 张：首页 Dashboard、③ 简历筛选排序表、⑤ AI 模拟面试。
+
+<!-- ![Dashboard](docs/screenshots/dashboard.png) -->
+<!-- ![Screening](docs/screenshots/screening.png) -->
+<!-- ![Interview](docs/screenshots/interview.png) -->
+
 ---
 
 ## 1. 这是什么 / 解决什么问题
