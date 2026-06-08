@@ -1,5 +1,11 @@
 # HR 提效智能体（HR AI Agent）
 
+[![CI](https://github.com/Landjun/hr-ai-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Landjun/hr-ai-agent/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+📖 English version: [README.en.md](README.en.md)
+
 > 面向 **HR / 招聘负责人 / 面试官** 的 AI 提效系统。
 > 自动读 JD、读简历、抽取结构化信息、按规则**带证据地**评分、生成筛选结论与面试提纲，
 > 还能作为 **AI 面试官** 对你进行模拟面试并生成提升报告。
@@ -15,6 +21,12 @@
 - **并发提速**：批量简历并行评分，10 份从 ~4 分钟降到 ~30 秒。
 - **双智能体**：简历筛选 + AI 面试（协助面试官提纲 / 一次一问的模拟面试）。
 - **架构预留**：飞书多维表格 / Coze / 企业微信集成接口已留好。
+
+## 📂 效果示例（无需运行，直接在 GitHub 上看）
+
+- [候选人排序表](docs/examples/ranking_sample.md)
+- [单人初筛报告（分维度+证据+风险+建议面试题）](docs/examples/screening_report_sample.md)
+- [AI 模拟面试报告（分维度+每题复盘+7天提升计划）](docs/examples/interview_report_sample.md)
 
 ---
 

@@ -602,11 +602,20 @@ def _answer_feedback(payload: Dict[str, Any]) -> str:
 # ---------------------------------------------------------------------------
 # 路由分发
 # ---------------------------------------------------------------------------
+def _score_and_decide(payload: Dict[str, Any]) -> str:
+    """合并版：一次产出『维度评分 + 筛选结论』。复用打分与结论两个 Mock 并合并。"""
+    dim_scores = json.loads(_resume_score(payload))
+    decision = json.loads(_screening_decision({**payload, "dimension_scores": dim_scores}))
+    decision["dimension_scores"] = dim_scores
+    return _dumps(decision)
+
+
 _DISPATCH = {
     "jd_parse": _jd_parse,
     "resume_extract": _resume_extract,
     "resume_score": _resume_score,
     "screening_decision": _screening_decision,
+    "score_and_decide": _score_and_decide,
     "interview_plan": _interview_plan,
     "interview_question": _interview_question,
     "answer_feedback": _answer_feedback,

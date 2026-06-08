@@ -14,7 +14,6 @@ from app.llm_client import get_llm
 from app.models import Application, Job, Resume, ScreeningRecord
 from app.prompts import load_prompt
 from app.schemas import ScreeningResult
-from app.services.resume_scorer import score_resume
 from app.utils.json_parser import parse_json
 from app.utils.scoring import level_of, total_of
 
@@ -55,6 +54,60 @@ def _d(d: Dict[str, Any]):
         return DimensionScore(dimension=str(d.get("dimension", "")))
 
 
+def score_and_decide(jd: Dict[str, Any], resume: Dict[str, Any],
+                     job_title: str = "通用") -> tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    """合并「评分 + 结论」为一次大模型调用（单份简历从 3 次调用降到 2 次）。
+
+    若合并调用未能返回完整的逐维度评分，则自动回退到「评分 + 结论」两步法，
+    保证结果质量不退化。
+    """
+    from app.schemas import DimensionScore
+    from app.services.resume_scorer import get_scoring_dimensions, score_resume
+    from app.utils.scoring import clamp_dimension_scores
+
+    dimensions_meta = get_scoring_dimensions(job_title)
+    system = load_prompt("score_and_decide_prompt")
+    user = (
+        f"【JD】\n{jd}\n\n【候选人简历】\n{resume}\n\n【评分维度】\n{dimensions_meta}\n\n"
+        "请逐维度打分并直接给出整体筛选结论，合并为一个 JSON。"
+    )
+    raw = get_llm().run(
+        "score_and_decide", system, user,
+        payload={"jd": jd, "resume": resume, "dimensions": dimensions_meta},
+    )
+    data = parse_json(raw, default={})
+
+    dim_scores: List[Dict[str, Any]] = []
+    if isinstance(data, dict):
+        for item in data.get("dimension_scores", []) or []:
+            try:
+                dim_scores.append(DimensionScore(**item).model_dump())
+            except Exception:
+                continue
+
+    # 合并调用不可靠 → 回退两步法（保证质量）
+    if len(dim_scores) < len(dimensions_meta):
+        dim_scores = score_resume(jd, resume, job_title)
+        return dim_scores, _decide(jd, resume, dim_scores)
+
+    dim_scores = clamp_dimension_scores(dim_scores)
+    decision_fields = {k: data[k] for k in
+                       ["summary", "strengths", "risks", "missing_requirements",
+                        "suggested_interview_questions", "manual_review_needed"]
+                       if k in data}
+    try:
+        result = ScreeningResult(**decision_fields)
+    except Exception:
+        result = ScreeningResult()
+    total = total_of(dim_scores)
+    result.total_score = total
+    result.level = level_of(total)
+    result.dimension_scores = [_d(d) for d in dim_scores]
+    if "仅供" not in result.summary:
+        result.summary = (result.summary + " 仅供 HR 辅助参考，最终由人工确认。").strip()
+    return dim_scores, result.model_dump()
+
+
 def screen(job_id: int, resume_id: int) -> Dict[str, Any]:
     """对单个 (job, resume) 执行评分 + 结论，写入 applications / screening_records。"""
     with session_scope() as session:
@@ -66,9 +119,8 @@ def screen(job_id: int, resume_id: int) -> Dict[str, Any]:
         resume_dict = resume.structured_json or {"raw_text": resume.raw_text}
         job_title = job.job_title or "通用"
 
-    # 评分（独立事务外执行，避免长事务）
-    dim_scores = score_resume(jd_dict, resume_dict, job_title)
-    decision = _decide(jd_dict, resume_dict, dim_scores)
+    # 评分 + 结论（合并为一次大模型调用；失败自动回退两步法）
+    dim_scores, decision = score_and_decide(jd_dict, resume_dict, job_title)
 
     with session_scope() as session:
         app_row = Application(
