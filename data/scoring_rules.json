@@ -1,0 +1,90 @@
+{
+  "job_title": "通用",
+  "total_score": 100,
+  "note": "评分规则结构化：维度(大类) -> 子项(小类) -> 指标 -> 权重。每个维度输出 score/evidence/risk/reason。总分为各维度之和。可按岗位复制本文件并调整权重。",
+  "dimensions": [
+    {
+      "dimension": "岗位匹配度",
+      "max_score": 25,
+      "description": "候选人整体方向、求职意向与 JD 岗位的匹配程度",
+      "indicators": [
+        {"name": "求职意向与岗位一致", "weight": 10},
+        {"name": "JD 关键词整体命中率", "weight": 10},
+        {"name": "行业/领域匹配", "weight": 5}
+      ]
+    },
+    {
+      "dimension": "必备技能匹配",
+      "max_score": 25,
+      "description": "JD must-have 硬技能在简历中的命中与证据强度",
+      "indicators": [
+        {"name": "核心编程语言/框架命中", "weight": 10},
+        {"name": "岗位核心技术(如 RAG/Agent)命中", "weight": 10},
+        {"name": "技能有项目佐证而非仅罗列", "weight": 5}
+      ]
+    },
+    {
+      "dimension": "项目经验匹配",
+      "max_score": 20,
+      "description": "项目背景/角色/难点/结果与岗位要求的契合度",
+      "indicators": [
+        {"name": "项目方向与岗位相关", "weight": 8},
+        {"name": "个人贡献清晰", "weight": 6},
+        {"name": "有量化结果与复盘", "weight": 6}
+      ]
+    },
+    {
+      "dimension": "工作经历匹配",
+      "max_score": 15,
+      "description": "公司、岗位、年限、职责与 JD 的契合度",
+      "indicators": [
+        {"name": "岗位职责相关", "weight": 8},
+        {"name": "工作年限满足要求", "weight": 4},
+        {"name": "公司/行业背景加分", "weight": 3}
+      ]
+    },
+    {
+      "dimension": "教育背景",
+      "max_score": 5,
+      "description": "学历、院校、专业与岗位要求的匹配（仅 JD 明确要求时计权，不作歧视性判断）",
+      "indicators": [
+        {"name": "学历达到 JD 要求", "weight": 3},
+        {"name": "专业相关", "weight": 1},
+        {"name": "院校亮点", "weight": 1}
+      ]
+    },
+    {
+      "dimension": "稳定性与表达质量",
+      "max_score": 5,
+      "description": "跳槽频率、简历表达清晰度与逻辑性（仅核实事实，不预设负面）",
+      "indicators": [
+        {"name": "跳槽频率合理", "weight": 3},
+        {"name": "简历结构清晰、信息完整", "weight": 2}
+      ]
+    },
+    {
+      "dimension": "加分项",
+      "max_score": 5,
+      "description": "竞赛/开源/论文/证书/个人作品等额外亮点",
+      "indicators": [
+        {"name": "开源/论文/专利", "weight": 2},
+        {"name": "竞赛/获奖", "weight": 2},
+        {"name": "个人 IP/作品展示", "weight": 1}
+      ]
+    }
+  ],
+  "levels": [
+    {"min": 85, "label": "强烈推荐面试"},
+    {"min": 70, "label": "建议面试"},
+    {"min": 60, "label": "备选"},
+    {"min": 0, "label": "暂不推荐"}
+  ],
+  "safety": [
+    "AI 不做最终录用决定，只做辅助判断。",
+    "必须输出证据，不允许只给结论。",
+    "不得根据性别、婚育、民族、宗教、健康状况等非岗位相关因素做负面判断。",
+    "年龄、学历、工作年限仅在 JD 明确要求时作为岗位匹配信息处理。",
+    "简历中没有证据的能力，不能默认候选人具备。",
+    "低置信度判断必须标记『需人工复核』。"
+  ]
+}

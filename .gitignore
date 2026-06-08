@@ -1,0 +1,24 @@
+# 环境与密钥
+.env
+*.db
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# 产出文件（保留目录占位，忽略实际报告）
+outputs/screening_reports/*
+outputs/interview_reports/*
+!outputs/screening_reports/.gitkeep
+!outputs/interview_reports/.gitkeep
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
