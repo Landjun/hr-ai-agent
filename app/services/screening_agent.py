@@ -21,10 +21,15 @@ from app.utils.scoring import level_of, total_of
 def _decide(jd: Dict[str, Any], resume: Dict[str, Any],
             dim_scores: List[Dict[str, Any]]) -> Dict[str, Any]:
     """汇总维度分 → 总分、等级、优势、风险、建议问题。"""
+    from app.utils.formatting import format_jd, format_resume
+
+    dim_text = "\n".join(
+        f"- {d.get('dimension', '')}：{d.get('score', 0)}/{d.get('max_score', 0)}"
+        f"（{d.get('reason', '')}）" for d in dim_scores)
     system = load_prompt("screening_decision_prompt")
     user = (
-        f"【JD】\n{jd}\n\n【简历】\n{resume}\n\n【维度评分】\n{dim_scores}\n\n"
-        "请汇总输出筛选结论 JSON。"
+        f"【JD】\n{format_jd(jd)}\n\n【简历】\n{format_resume(resume)}\n\n"
+        f"【各维度评分】\n{dim_text}\n\n请汇总输出筛选结论 JSON。"
     )
     raw = get_llm().run(
         "screening_decision", system, user,
@@ -63,12 +68,17 @@ def score_and_decide(jd: Dict[str, Any], resume: Dict[str, Any],
     """
     from app.schemas import DimensionScore
     from app.services.resume_scorer import get_scoring_dimensions, score_resume
+    from app.utils.formatting import format_jd, format_resume
     from app.utils.scoring import clamp_dimension_scores
 
     dimensions_meta = get_scoring_dimensions(job_title)
+    dim_text = "\n".join(
+        f"- {d['dimension']}（满分 {d['max_score']}）：{d.get('description', '')}"
+        for d in dimensions_meta)
     system = load_prompt("score_and_decide_prompt")
     user = (
-        f"【JD】\n{jd}\n\n【候选人简历】\n{resume}\n\n【评分维度】\n{dimensions_meta}\n\n"
+        f"【JD】\n{format_jd(jd)}\n\n【候选人简历】\n{format_resume(resume)}\n\n"
+        f"【评分维度（共 {len(dimensions_meta)} 项，请逐项打分）】\n{dim_text}\n\n"
         "请逐维度打分并直接给出整体筛选结论，合并为一个 JSON。"
     )
     raw = get_llm().run(

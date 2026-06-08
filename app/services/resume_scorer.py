@@ -60,11 +60,17 @@ def get_scoring_dimensions(job_title: str = "通用") -> List[Dict[str, Any]]:
 def score_resume(jd: Dict[str, Any], resume: Dict[str, Any],
                  job_title: str = "通用") -> List[Dict[str, Any]]:
     """对简历逐维度打分，返回 DimensionScore 列表（dict）。"""
+    from app.utils.formatting import format_jd, format_resume
+
     dimensions = get_scoring_dimensions(job_title)
+    dim_text = "\n".join(
+        f"- {d['dimension']}（满分 {d['max_score']}）：{d.get('description', '')}"
+        for d in dimensions)
     system = load_prompt("resume_score_prompt")
     user = (
-        f"【JD】\n{jd}\n\n【候选人简历】\n{resume}\n\n"
-        f"【评分维度】\n{dimensions}\n\n请逐维度打分并给出证据与风险。"
+        f"【JD】\n{format_jd(jd)}\n\n【候选人简历】\n{format_resume(resume)}\n\n"
+        f"【评分维度（共 {len(dimensions)} 项，请逐项打分）】\n{dim_text}\n\n"
+        "请逐维度打分并给出证据与风险。"
     )
 
     raw = get_llm().run(

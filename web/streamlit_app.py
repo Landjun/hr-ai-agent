@@ -33,8 +33,8 @@ from app.services.report_generator import (build_ranking_markdown,  # noqa: E402
 from app.services.resume_extractor import extract_resume  # noqa: E402
 from app.services.resume_parser import (parse_resume_bytes,  # noqa: E402
                                         parse_resume_text)
-from app.services.screening_agent import (screen,  # noqa: E402
-                                          screen_resumes_concurrently)
+from app.services.screening_agent import (get_application_detail,  # noqa: E402
+                                          screen, screen_resumes_concurrently)
 from sqlmodel import Session, func, select  # noqa: E402
 
 st.set_page_config(page_title="HR 提效智能体", page_icon="🧑‍💼", layout="wide")
@@ -73,6 +73,34 @@ def job_label(j: Job) -> str:
     return f"#{j.id} {j.job_title or '未命名岗位'}"
 
 
+# 推荐等级 → (emoji, 颜色)
+LEVEL_STYLE = {
+    "强烈推荐面试": ("🟢", "#16a34a"),
+    "建议面试": ("🟡", "#2563eb"),
+    "备选": ("🟠", "#d97706"),
+    "暂不推荐": ("🔴", "#dc2626"),
+}
+
+st.markdown("""
+<style>
+  .block-container { padding-top: 2.2rem; }
+  div[data-testid="stMetric"] { background:#f8fafc; border:1px solid #e8edf3;
+      border-radius:12px; padding:12px 16px; }
+  div[data-testid="stMetricValue"] { color:#2563eb; }
+  .hero { background:linear-gradient(135deg,#2563eb,#1e40af); color:#fff;
+      padding:18px 22px; border-radius:14px; margin-bottom:8px; }
+  .hero h2 { color:#fff; margin:0; }
+  .badge { padding:2px 10px; border-radius:999px; font-weight:600; font-size:14px; }
+</style>
+""", unsafe_allow_html=True)
+
+
+def level_badge_html(level: str) -> str:
+    emoji, color = LEVEL_STYLE.get(level, ("⚪", "#6b7280"))
+    return (f"<span class='badge' style='background:{color}22;color:{color}'>"
+            f"{emoji} {level}</span>")
+
+
 def llm_banner():
     llm = get_llm()
     if settings.offline_mode:
@@ -104,9 +132,11 @@ st.sidebar.caption("⚠️ AI 仅辅助，不做最终录用决定")
 
 # ============================ ① Dashboard ============================
 if PAGE.startswith("①"):
-    st.title("首页 Dashboard")
-    st.write("面向 HR / 招聘负责人 / 面试官的 AI 提效系统。AI 自动读 JD、读简历、"
-             "提取信息、评分、生成结论与面试提纲，并能作为面试官对你模拟面试。")
+    st.markdown(
+        "<div class='hero'><h2>🧑‍💼 HR 提效智能体</h2>"
+        "<p style='margin:6px 0 0'>AI 自动读 JD、读简历、带证据评分、生成结论与面试提纲，"
+        "并能作为面试官对你模拟面试。AI 仅辅助，不做最终录用决定。</p></div>",
+        unsafe_allow_html=True)
     llm_banner()
     with Session(engine) as s:
         n_jobs = s.exec(select(func.count()).select_from(Job)).one()
@@ -230,7 +260,13 @@ elif PAGE.startswith("③"):
                   "highest_education": "最高学历", "years_of_experience": "工作年限",
                   "core_skills": "核心技能", "main_strength": "主要优势",
                   "main_risk": "主要风险", "next_action": "建议下一步", "application_id": "应用ID"}
-        st.dataframe(df.rename(columns=rename), use_container_width=True, hide_index=True)
+        df_disp = df.rename(columns=rename).copy()
+        df_disp["推荐等级"] = df_disp["推荐等级"].map(
+            lambda l: f"{LEVEL_STYLE.get(l, ('⚪',))[0]} {l}")
+        st.dataframe(
+            df_disp, use_container_width=True, hide_index=True,
+            column_config={"总分": st.column_config.ProgressColumn(
+                "总分", min_value=0, max_value=100, format="%.1f")})
 
         n_cand = len(df)
         st.markdown("**导出排序表**")
@@ -258,9 +294,23 @@ elif PAGE.startswith("③"):
         st.subheader("查看 / 下载单份初筛报告")
         app_id = st.selectbox("选择候选人（应用ID）", df["application_id"].tolist(),
                               format_func=lambda x: f"应用#{x}")
+        detail = get_application_detail(int(app_id))
+        if detail:
+            appd = detail["application"]
+            mc1, mc2, mc3 = st.columns([1, 1, 2])
+            mc1.metric("总分", f"{appd['total_score']:.1f} / 100")
+            mc2.markdown("**推荐等级**<br>" + level_badge_html(appd["level"]),
+                         unsafe_allow_html=True)
+            mc3.metric("需人工复核", "是" if appd["manual_review_needed"] else "否")
+            st.markdown("**分维度得分**")
+            for d in detail["dimension_scores"]:
+                maxs = d["max_score"] or 1
+                cap, bar = st.columns([2, 5])
+                cap.markdown(f"{d['dimension']}　**{d['score']:.0f}**/{d['max_score']:.0f}")
+                bar.progress(min(1.0, max(0.0, d["score"] / maxs)))
         md = build_screening_markdown(int(app_id))
         title = title_from_markdown(md)
-        with st.expander("预览报告"):
+        with st.expander("查看完整报告全文"):
             st.markdown(md)
         d1, d2, d3 = st.columns(3)
         d1.download_button("⬇️ Markdown", md, file_name=f"screening_{app_id}.md")
