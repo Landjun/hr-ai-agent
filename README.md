@@ -94,6 +94,21 @@ python run.py
 - 面试报告：模拟面试结束后下载，或 API `GET /reports/interview/{session_id}`。
 - 文件默认输出到 `outputs/`。
 
+### 按岗位定制评分规则（已内置：医疗AI产品经理）
+
+系统按 JD 的岗位名 `job_title` **自动选用**对应评分规则（找不到回退「通用」7 维）。
+新增一个岗位规则**无需改代码**——在 `data/` 放一个 `scoring_rules_<岗位>.json` 即可，
+启动时自动入库。已内置示例：
+
+- 通用：`data/scoring_rules.json`（岗位匹配/必备技能/项目/经历/教育/稳定性/加分）
+- **医疗AI产品经理**：`data/scoring_rules_medical_pm.json`
+  （医疗行业理解 20 / AI产品能力 25 / 产品方法论 15 / 项目与商业化结果 20 /
+  跨部门协作 10 / 教育背景 5 / 加分项 5）
+
+体验：把 `data/sample_jd_medical_pm.md` 粘到「② JD 管理」解析（岗位名会识别为
+「医疗AI产品经理」），再到「③ 简历筛选」上传 `data/sample_resume_medical_pm_*.md`
+即可看到按 PM 维度打分的排序与带证据的报告。
+
 ---
 
 ## 7. 项目结构

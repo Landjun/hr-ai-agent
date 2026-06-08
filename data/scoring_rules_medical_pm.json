@@ -1,0 +1,82 @@
+{
+  "job_title": "医疗AI产品经理",
+  "total_score": 100,
+  "note": "面向『医疗AI产品经理/高级产品经理(医疗AI)』岗位的专属评分规则。把通用 7 维替换为更贴合 PM 岗位的维度：医疗行业理解、AI产品能力、产品方法论、项目与商业化结果、跨部门协作、教育背景、加分项。系统按岗位名 job_title 自动选用本规则（找不到回退通用）。",
+  "dimensions": [
+    {
+      "dimension": "医疗行业理解",
+      "max_score": 20,
+      "description": "对医疗/医学业务、临床流程、医院信息化、医保合规、注册证(NMPA)等的理解深度",
+      "indicators": [
+        {"name": "有医疗/医学/医院/临床相关经历", "weight": 10},
+        {"name": "了解医院信息化/电子病历/HIS/院内流程", "weight": 6},
+        {"name": "了解医疗合规/注册证/NMPA/数据安全", "weight": 4}
+      ]
+    },
+    {
+      "dimension": "AI产品能力",
+      "max_score": 25,
+      "description": "AI/大模型产品的设计与落地能力：算法协同、数据闭环、AI 能力边界把握",
+      "indicators": [
+        {"name": "做过 AI/大模型/算法类产品", "weight": 10},
+        {"name": "懂数据/标注/模型评测/数据闭环", "weight": 8},
+        {"name": "把握 AI 能力边界与落地场景", "weight": 7}
+      ]
+    },
+    {
+      "dimension": "产品方法论",
+      "max_score": 15,
+      "description": "需求分析、竞品分析、用户研究、原型/PRD、MVP 与迭代等产品基本功",
+      "indicators": [
+        {"name": "需求分析与竞品分析", "weight": 6},
+        {"name": "原型/PRD/用户研究", "weight": 5},
+        {"name": "MVP 与数据驱动迭代", "weight": 4}
+      ]
+    },
+    {
+      "dimension": "项目与商业化结果",
+      "max_score": 20,
+      "description": "项目从 0 到 1 经验、量化结果与商业化落地（指标/营收/转化/留存）",
+      "indicators": [
+        {"name": "有 0 到 1 项目经验", "weight": 8},
+        {"name": "有量化结果(指标/增长/转化)", "weight": 7},
+        {"name": "有商业化/落地/付费结果", "weight": 5}
+      ]
+    },
+    {
+      "dimension": "跨部门协作与推动",
+      "max_score": 10,
+      "description": "与医生/算法/研发/运营等多方协作、推动产品落地的能力",
+      "indicators": [
+        {"name": "跨部门协作经历", "weight": 5},
+        {"name": "推动落地/项目执行力", "weight": 5}
+      ]
+    },
+    {
+      "dimension": "教育背景",
+      "max_score": 5,
+      "description": "学历/院校/专业（医学或计算机相关加分；仅 JD 明确要求时计权，不作歧视性判断）",
+      "indicators": [
+        {"name": "学历达到 JD 要求", "weight": 3},
+        {"name": "医学/计算机相关专业", "weight": 1},
+        {"name": "院校亮点", "weight": 1}
+      ]
+    },
+    {
+      "dimension": "加分项",
+      "max_score": 5,
+      "description": "医学背景、专利/论文、行业奖项、个人作品等",
+      "indicators": [
+        {"name": "医学/临床背景", "weight": 2},
+        {"name": "专利/论文/获奖", "weight": 2},
+        {"name": "个人作品/影响力", "weight": 1}
+      ]
+    }
+  ],
+  "levels": [
+    {"min": 85, "label": "强烈推荐面试"},
+    {"min": 70, "label": "建议面试"},
+    {"min": 60, "label": "备选"},
+    {"min": 0, "label": "暂不推荐"}
+  ]
+}

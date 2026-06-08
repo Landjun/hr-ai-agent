@@ -25,12 +25,33 @@ SKILL_KEYWORDS = [
     "产品", "需求", "原型", "axure", "用户研究", "数据驱动", "增长", "转化",
     "项目管理", "敏捷", "scrum", "跨部门", "协作", "复盘", "指标", "okr", "kpi",
     "飞书", "多维表格", "工作流", "自动化", "api", "对接", "部署", "上线",
-    "医疗", "医学", "影像", "诊断", "电子病历", "his", "临床",
+    # 产品经理通用
+    "产品经理", "prd", "竞品", "竞品分析", "需求分析", "用户画像", "mvp", "迭代",
+    "商业化", "gmv", "dau", "mau", "留存", "转化率", "a/b", "数据中台", "路演",
+    "tob", "toc", "tog", "to b", "to c", "to g", "0到1", "从0到1", "从 0 到 1",
+    # 医疗 / 医疗 AI
+    "医疗", "医学", "医院", "影像", "病理", "诊断", "辅助诊断", "智能问诊", "随访",
+    "电子病历", "his", "临床", "临床试验", "院内", "医院信息化", "医保", "处方",
+    "合规", "注册证", "三类证", "nmpa", "药监", "标注", "数据标注", "cv", "计算机视觉",
 ]
 
 EDU_KEYWORDS = ["博士", "硕士", "本科", "大专", "专科", "研究生", "学士", "mba"]
 GOOD_SCHOOL = ["清华", "北大", "985", "211", "复旦", "上海交大", "浙大", "南大",
                "中科院", "人民大学", "双一流", "一流大学"]
+
+# 岗位专属维度 → 关键词桶（用于通用维度的证据匹配，便于扩展到不同岗位）
+_DIM_KEYWORDS = {
+    "医疗行业理解": ["医疗", "医学", "医院", "临床", "电子病历", "his", "医保", "合规",
+                "注册证", "三类证", "nmpa", "药监", "影像", "病理", "诊断", "随访",
+                "院内", "医院信息化", "处方", "辅助诊断", "智能问诊"],
+    "ai产品能力": ["大模型", "llm", "ai", "智能体", "agent", "rag", "算法", "数据",
+              "标注", "数据标注", "cv", "计算机视觉", "nlp", "辅助诊断", "智能问诊",
+              "embedding", "知识库", "prompt", "影像"],
+    "产品方法论": ["产品", "prd", "需求", "需求分析", "原型", "竞品", "竞品分析",
+              "用户研究", "用户画像", "mvp", "迭代", "数据驱动", "axure", "路演"],
+    "跨部门协作与推动": ["跨部门", "协作", "推动", "落地", "医生", "研发", "运营",
+                 "项目管理", "敏捷", "scrum", "对接"],
+}
 
 PHONE_RE = re.compile(r"(?<!\d)(1[3-9]\d{9})(?!\d)")
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
@@ -162,6 +183,9 @@ def _resume_extract(payload: Dict[str, Any]) -> str:
     email_m = EMAIL_RE.search(text)
 
     # 姓名：取靠前的一个 2~4 字中文短行，或「姓名:」后内容
+    _name_headers = {"个人优势", "工作经历", "工作经验", "项目经历", "项目经验", "教育背景",
+                     "专业技能", "自我评价", "求职意向", "基本信息", "联系方式", "个人简历",
+                     "个人信息", "教育经历", "实习经历", "荣誉奖项"}
     name = ""
     for ln in lines[:8]:
         m = re.search(r"姓\s*名[:：]?\s*([一-龥]{2,4})", ln)
@@ -172,6 +196,14 @@ def _resume_extract(payload: Dict[str, Any]) -> str:
         for ln in lines[:5]:
             if re.fullmatch(r"[一-龥]{2,4}", ln):
                 name = ln
+                break
+    if not name:
+        # 兜底：带水印噪声的 PDF，姓名常被包裹成「_ _ 陈志国 _ _」，
+        # 取该行去掉非中文后的 2-4 字中文（排除常见小标题）
+        for ln in lines[:6]:
+            cjk = "".join(re.findall(r"[一-龥]", ln))
+            if 2 <= len(cjk) <= 4 and cjk not in _name_headers and "：" not in ln:
+                name = cjk
                 break
 
     education, school, major = "", "", ""
@@ -332,11 +364,36 @@ def _resume_score(payload: Dict[str, Any]) -> str:
                             else "简历信息缺失较多，表达质量待核实")
             reason = "综合跳槽频率与简历表达完整度评估。"
         elif dim == "加分项":
-            bonus = [k for k in ["开源", "论文", "专利", "竞赛", "获奖", "github", "博客", "mba", "证书"]
-                     if k in resume_text]
+            bonus = [k for k in ["开源", "论文", "专利", "竞赛", "获奖", "github", "博客",
+                                 "mba", "证书", "医学背景", "临床背景"] if k in resume_text]
             ratio = min(1.0, len(bonus) / 3.0)
             evidence = [f"加分信号：{b}" for b in bonus] or ["未发现明显加分项"]
             reason = f"检索到 {len(bonus)} 个加分信号。"
+        elif dim == "项目与商业化结果":
+            projs = resume.get("project_experiences", [])
+            quant = [ln for ln in resume_text.split("\n")
+                     if any(c in ln for c in ["%", "万", "倍", "增长", "转化", "gmv",
+                                              "dau", "留存", "营收", "提升", "下降"])]
+            biz = [k for k in ["商业化", "0到1", "从0到1", "从 0 到 1", "上线", "落地",
+                               "盈利", "营收", "付费"] if k in resume_text]
+            ratio = min(1.0, 0.4 * min(1.0, len(projs) / 2.0)
+                        + 0.35 * min(1.0, len(quant) / 2.0)
+                        + 0.25 * min(1.0, len(biz) / 2.0))
+            evidence = [f"项目：{p.get('project_name', '')}" for p in projs[:2]]
+            evidence += [f"量化/商业化：{q.strip()[:40]}" for q in quant[:2]]
+            if biz:
+                evidence.append("商业化信号：" + "、".join(biz[:4]))
+            if not quant:
+                risk.append("缺少量化结果，建议面试追问具体指标与商业化数据")
+            reason = f"识别项目 {len(projs)} 段、量化句 {len(quant)} 处、商业化信号 {len(biz)} 个。"
+        elif dim.lower() in _DIM_KEYWORDS:
+            bucket = _DIM_KEYWORDS[dim.lower()]
+            hit = [k for k in bucket if k in resume_text]
+            ratio = min(1.0, len(hit) / max(3, len(bucket) * 0.4))
+            evidence = [f"命中：{h}" for h in hit[:6]] or [f"简历中较少出现「{dim}」相关证据"]
+            if len(hit) < 2:
+                risk.append(f"{dim}相关证据不足，需人工/面试核实")
+            reason = f"在简历中命中「{dim}」相关关键词 {len(hit)} 个。"
         else:
             ratio, _, _ = match_ratio(jd_keywords)
             reason = "通用维度按 JD 关键词命中率评估。"

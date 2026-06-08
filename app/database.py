@@ -6,7 +6,7 @@ from typing import Iterator
 
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from app.config import settings
+from app.config import ROOT_DIR, settings
 from app.models import ScoringRule  # noqa: F401  确保模型被注册
 from app import models  # noqa: F401  注册所有表
 
@@ -16,9 +16,10 @@ engine = create_engine(settings.database_url, echo=False, connect_args=connect_a
 
 
 def init_db() -> None:
-    """建表 + 写入默认评分规则（幂等）。"""
+    """建表 + 写入默认评分规则 + 岗位专属规则（幂等）。"""
     SQLModel.metadata.create_all(engine)
     _seed_default_scoring_rules()
+    _seed_job_rulesets_from_files()
 
 
 def get_session() -> Iterator[Session]:
@@ -55,7 +56,9 @@ DEFAULT_DIMENSIONS = [
 
 def _seed_default_scoring_rules() -> None:
     with session_scope() as session:
-        exists = session.exec(select(ScoringRule).limit(1)).first()
+        exists = session.exec(
+            select(ScoringRule).where(ScoringRule.job_title == "通用").limit(1)
+        ).first()
         if exists:
             return
         for job_title, dim, sub, max_score, desc in DEFAULT_DIMENSIONS:
@@ -69,3 +72,40 @@ def _seed_default_scoring_rules() -> None:
                     description=desc,
                 )
             )
+
+
+def _seed_job_rulesets_from_files() -> None:
+    """从 data/scoring_rules*.json 载入岗位专属规则（job_title != 通用），幂等。
+
+    JSON 结构：{"job_title": "...", "dimensions": [{"dimension","max_score","description"}...]}
+    放一个新的 scoring_rules_xxx.json 即可新增一个岗位的评分规则，无需改代码。
+    """
+    import json
+
+    data_dir = ROOT_DIR / "data"
+    if not data_dir.exists():
+        return
+    for path in sorted(data_dir.glob("scoring_rules*.json")):
+        try:
+            spec = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        job_title = (spec.get("job_title") or "").strip()
+        dims = spec.get("dimensions") or []
+        if not job_title or job_title == "通用" or not dims:
+            continue
+        with session_scope() as session:
+            exists = session.exec(
+                select(ScoringRule).where(ScoringRule.job_title == job_title).limit(1)
+            ).first()
+            if exists:
+                continue
+            for d in dims:
+                session.add(ScoringRule(
+                    job_title=job_title,
+                    dimension=d.get("dimension", ""),
+                    sub_dimension="",
+                    max_score=float(d.get("max_score", 0) or 0),
+                    weight=1.0,
+                    description=d.get("description", ""),
+                ))
