@@ -96,6 +96,54 @@ def screen(job_id: int, resume_id: int) -> Dict[str, Any]:
     return decision
 
 
+def process_one_resume(job_id: int, raw_text: str, file_name: str) -> Dict[str, Any]:
+    """单份简历完整流水线：抽取 → 入库 → 评分结论。供并发批处理调用。"""
+    from app.models import Resume
+    from app.services.resume_extractor import extract_resume
+
+    structured = extract_resume(raw_text)
+    with session_scope() as session:
+        resume = Resume(candidate_name=structured.get("name", ""), raw_text=raw_text,
+                        structured_json=structured, file_name=file_name)
+        session.add(resume)
+        session.flush()
+        resume_id = resume.id
+    result = screen(job_id, resume_id)
+    result["name"] = structured.get("name", "")
+    result["file_name"] = file_name
+    return result
+
+
+def screen_resumes_concurrently(job_id: int, items: List[Dict[str, str]],
+                                max_workers: int = 5) -> List[Dict[str, Any]]:
+    """并发处理多份简历。
+
+    items: [{"raw_text": ..., "file_name": ...}, ...]
+    每份简历的「抽取+评分+结论」（3 次大模型调用，均为网络 I/O）放进独立线程，
+    多份同时进行，把串行的总耗时压缩到接近单份耗时。
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    if not items:
+        return []
+    results: List[Dict[str, Any]] = []
+    workers = max(1, min(max_workers, len(items)))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(process_one_resume, job_id, it["raw_text"],
+                        it.get("file_name", "resume.txt")): it
+            for it in items
+        }
+        for fut in as_completed(futures):
+            it = futures[fut]
+            try:
+                results.append(fut.result())
+            except Exception as exc:  # 单份失败不影响其他份
+                results.append({"error": str(exc),
+                                "file_name": it.get("file_name", "")})
+    return results
+
+
 def rank_for_job(job_id: int) -> List[Dict[str, Any]]:
     """按总分对某岗位的候选人排序，输出排序表。"""
     rows: List[Dict[str, Any]] = []

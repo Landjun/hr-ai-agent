@@ -28,7 +28,8 @@ from app.services.report_generator import (build_screening_markdown,  # noqa: E4
 from app.services.resume_extractor import extract_resume  # noqa: E402
 from app.services.resume_parser import (parse_resume_bytes,  # noqa: E402
                                         parse_resume_text)
-from app.services.screening_agent import screen  # noqa: E402
+from app.services.screening_agent import (screen,  # noqa: E402
+                                          screen_resumes_concurrently)
 from sqlmodel import Session, func, select  # noqa: E402
 
 st.set_page_config(page_title="HR 提效智能体", page_icon="🧑‍💼", layout="wide")
@@ -174,35 +175,30 @@ elif PAGE.startswith("③"):
     pasted = st.text_area("或直接粘贴一份简历文本", height=160)
 
     if st.button("🚀 解析并评分", type="primary"):
-        new_resume_ids = []
-        with st.spinner("解析 + 评分中……"):
-            for f in files or []:
-                raw = parse_resume_bytes(f.read(), f.name)
-                structured = extract_resume(raw)
-                r = Resume(candidate_name=structured.get("name", ""), raw_text=raw,
-                           structured_json=structured, file_name=f.name)
-                with Session(engine) as s:
-                    s.add(r)
-                    s.commit()
-                    s.refresh(r)
-                new_resume_ids.append(r.id)
-            if pasted.strip():
-                raw = parse_resume_text(pasted)
-                structured = extract_resume(raw)
-                r = Resume(candidate_name=structured.get("name", ""), raw_text=raw,
-                           structured_json=structured, file_name="pasted.txt")
-                with Session(engine) as s:
-                    s.add(r)
-                    s.commit()
-                    s.refresh(r)
-                new_resume_ids.append(r.id)
+        # 先把所有输入读成纯文本（本地、快），再并发跑「抽取+评分+结论」
+        items = []
+        for f in files or []:
+            items.append({"raw_text": parse_resume_bytes(f.read(), f.name),
+                          "file_name": f.name})
+        if pasted.strip():
+            items.append({"raw_text": parse_resume_text(pasted),
+                          "file_name": "pasted.txt"})
 
-            for rid in new_resume_ids:
-                screen(job.id, rid)
-        if new_resume_ids:
-            st.success(f"已完成 {len(new_resume_ids)} 份简历的解析与评分。")
-        else:
+        if not items:
             st.warning("没有检测到简历输入。")
+        else:
+            import time
+            t0 = time.time()
+            with st.spinner(f"并发解析 + 评分 {len(items)} 份简历中……（真实模型约 20 秒/份，"
+                            f"但多份同时进行，总耗时接近单份）"):
+                results = screen_resumes_concurrently(job.id, items, max_workers=5)
+            ok = [r for r in results if "error" not in r]
+            err = [r for r in results if "error" in r]
+            st.success(f"已完成 {len(ok)} 份，用时 {time.time()-t0:.1f} 秒"
+                       f"（并发，非逐份累加）。")
+            if err:
+                st.warning(f"{len(err)} 份处理失败：" +
+                           "；".join(f"{e.get('file_name','?')}: {e['error']}" for e in err))
 
     st.divider()
     st.subheader("候选人排序")

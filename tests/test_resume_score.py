@@ -60,6 +60,21 @@ def test_ranking_orders_by_score():
     assert ranking[0]["rank"] == 1
 
 
+def test_concurrent_batch_screens_all():
+    from app.services.screening_agent import screen_resumes_concurrently
+
+    jid, _, _, _ = _make_job_and_resume(JD, STRONG)
+    items = [
+        {"raw_text": STRONG, "file_name": "strong.md"},
+        {"raw_text": WEAK, "file_name": "weak.md"},
+        {"raw_text": STRONG, "file_name": "strong2.md"},
+    ]
+    results = screen_resumes_concurrently(jid, items, max_workers=5)
+    assert len(results) == 3
+    assert all("error" not in r for r in results)
+    assert all("total_score" in r for r in results)
+
+
 def test_level_thresholds():
     assert level_of(90) == "强烈推荐面试"
     assert level_of(75) == "建议面试"

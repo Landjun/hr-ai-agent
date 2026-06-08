@@ -11,7 +11,11 @@ from app.models import ScoringRule  # noqa: F401  确保模型被注册
 from app import models  # noqa: F401  注册所有表
 
 # SQLite 需要 check_same_thread=False 以便 FastAPI / Streamlit 多线程访问
-connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+# check_same_thread=False 允许多线程访问；timeout 让并发写时等待锁而不是立刻报错
+connect_args = (
+    {"check_same_thread": False, "timeout": 30}
+    if settings.database_url.startswith("sqlite") else {}
+)
 engine = create_engine(settings.database_url, echo=False, connect_args=connect_args)
 
 
