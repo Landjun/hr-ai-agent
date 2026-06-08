@@ -29,6 +29,7 @@ class LLMClient:
                     api_key=settings.llm_api_key,
                     base_url=settings.llm_base_url,
                     timeout=settings.llm_timeout,
+                    max_retries=1,  # 减少失败时的重试退避，避免变慢
                 )
             except Exception as exc:  # 初始化失败也降级到离线，保证不崩
                 print(f"[LLMClient] 初始化真实客户端失败，降级离线 Mock：{exc}")
@@ -56,10 +57,22 @@ class LLMClient:
         try:
             return self._chat(system, user)
         except Exception as exc:
-            # 真实大模型调用失败（余额不足 402 / 超时 / 网络等）：
+            # 真实大模型调用失败（余额不足 402 / 鉴权 401 / 超时 / 网络等）：
             # 不让异常冒泡崩溃页面，本次自动降级为离线 Mock，保证流程跑完。
             self.last_error = f"{type(exc).__name__}: {exc}"
-            print(f"[LLMClient] 真实大模型调用失败，本次降级离线 Mock：{self.last_error}")
+            msg = self.last_error.lower()
+            fatal = any(k in msg for k in [
+                "insufficient balance", "402", "401", "invalid_api_key",
+                "incorrect api key", "authenticationerror", "permissiondenied",
+                "no such model", "model_not_found",
+            ])
+            if fatal:
+                # 熔断：余额/鉴权/模型这类「治不好」的错，本会话后续直接走离线，
+                # 不再每次都白等失败的 API 往返（否则会明显变慢）。
+                self.offline = True
+                print(f"[LLMClient] 致命错误，熔断转离线（本会话后续全部离线）：{self.last_error}")
+            else:
+                print(f"[LLMClient] 调用失败，本次降级离线：{self.last_error}")
             return mock_llm.generate(task, payload)
 
     def _chat(self, system: str, user: str) -> str:
