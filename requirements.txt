@@ -19,6 +19,10 @@ pypdf>=4.0
 pandas>=2.0
 openpyxl>=3.1
 
+# Report export (HTML + CJK PDF)
+markdown>=3.5
+reportlab>=4.0
+
 # LLM client (OpenAI-compatible: DeepSeek / Qwen / OpenAI ...)
 openai>=1.12
 python-dotenv>=1.0

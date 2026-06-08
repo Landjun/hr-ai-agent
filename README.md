@@ -111,9 +111,10 @@ python run.py
 5. 「⑤ AI 模拟面试」输入 JD（可选简历）→ 开始 → AI 一次问一题 → 结束生成报告。
 
 ### 导出报告
-- 排序表：`③ 简历筛选` 页的导出按钮，或 API `GET /reports/ranking/{job_id}?fmt=excel`。
-- 初筛报告：页面下载，或 API `GET /reports/screening/{application_id}`。
-- 面试报告：模拟面试结束后下载，或 API `GET /reports/interview/{session_id}`。
+- 排序表：`③ 简历筛选` 页导出按钮，或 API `GET /reports/ranking/{job_id}?fmt=excel`（excel/markdown/json）。
+- 初筛报告：页面一键下载 **Markdown / HTML / PDF**，或 API `GET /reports/screening/{application_id}?fmt=pdf`（markdown/html/pdf）。
+- 面试报告：模拟面试结束后下载 **Markdown / HTML / PDF**，或 API `GET /reports/interview/{session_id}?fmt=pdf`。
+- PDF 用 reportlab 内置 CJK 字体渲染，中文正常、跨平台、无需安装额外字体；HTML 可在浏览器 Ctrl+P 另存为 PDF。
 - 文件默认输出到 `outputs/`。
 
 ### 按岗位定制评分规则（已内置：医疗AI产品经理）

@@ -23,6 +23,9 @@ from app.models import Application, Job, Resume  # noqa: E402
 from app.services.interview_agent import (ask_next, finish_mock, start_mock,  # noqa: E402
                                          submit_answer)
 from app.services.interview_planner import generate_plan  # noqa: E402
+from app.services.report_exporter import (markdown_to_html,  # noqa: E402
+                                          markdown_to_pdf_bytes,
+                                          title_from_markdown)
 from app.services.report_generator import (build_screening_markdown,  # noqa: E402
                                            export_ranking, ranking_dataframe)
 from app.services.resume_extractor import extract_resume  # noqa: E402
@@ -225,11 +228,16 @@ elif PAGE.startswith("③"):
         st.subheader("查看 / 下载单份初筛报告")
         app_id = st.selectbox("选择候选人（应用ID）", df["application_id"].tolist(),
                               format_func=lambda x: f"应用#{x}")
-        if st.button("生成初筛报告"):
-            md = build_screening_markdown(int(app_id))
+        md = build_screening_markdown(int(app_id))
+        title = title_from_markdown(md)
+        with st.expander("预览报告"):
             st.markdown(md)
-            st.download_button("⬇️ 下载该报告(.md)", md,
-                               file_name=f"screening_{app_id}.md")
+        d1, d2, d3 = st.columns(3)
+        d1.download_button("⬇️ Markdown", md, file_name=f"screening_{app_id}.md")
+        d2.download_button("⬇️ HTML", markdown_to_html(md, title),
+                           file_name=f"screening_{app_id}.html", mime="text/html")
+        d3.download_button("⬇️ PDF", markdown_to_pdf_bytes(md, title),
+                           file_name=f"screening_{app_id}.pdf", mime="application/pdf")
     else:
         st.caption("还没有评分结果，先上传简历并点击「解析并评分」。")
 
@@ -370,8 +378,15 @@ elif PAGE.startswith("⑤"):
             rep = ss.mock_report
             st.success(f"面试结束！综合得分：{rep['final_score']}/100")
             st.markdown(rep["report_markdown"])
-            st.download_button("⬇️ 下载面试报告(.md)", rep["report_markdown"],
-                               file_name=f"interview_{ss.mock_session_id}.md")
+            _md = rep["report_markdown"]
+            _title = title_from_markdown(_md, "JD 模拟面试报告")
+            _sid = ss.mock_session_id
+            e1, e2, e3 = st.columns(3)
+            e1.download_button("⬇️ Markdown", _md, file_name=f"interview_{_sid}.md")
+            e2.download_button("⬇️ HTML", markdown_to_html(_md, _title),
+                               file_name=f"interview_{_sid}.html", mime="text/html")
+            e3.download_button("⬇️ PDF", markdown_to_pdf_bytes(_md, _title),
+                               file_name=f"interview_{_sid}.pdf", mime="application/pdf")
             if st.button("🔄 再来一场"):
                 for k in ["mock_session_id", "mock_max", "mock_current_q",
                           "mock_history", "mock_finished", "mock_report"]:
