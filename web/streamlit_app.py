@@ -26,8 +26,10 @@ from app.services.interview_planner import generate_plan  # noqa: E402
 from app.services.report_exporter import (markdown_to_html,  # noqa: E402
                                           markdown_to_pdf_bytes,
                                           title_from_markdown)
-from app.services.report_generator import (build_screening_markdown,  # noqa: E402
-                                           export_ranking, ranking_dataframe)
+from app.services.report_generator import (build_ranking_markdown,  # noqa: E402
+                                           build_screening_markdown,
+                                           export_job_package, export_ranking,
+                                           ranking_dataframe)
 from app.services.resume_extractor import extract_resume  # noqa: E402
 from app.services.resume_parser import (parse_resume_bytes,  # noqa: E402
                                         parse_resume_text)
@@ -37,6 +39,23 @@ from sqlmodel import Session, func, select  # noqa: E402
 
 st.set_page_config(page_title="HR 提效智能体", page_icon="🧑‍💼", layout="wide")
 init_db()
+
+
+# ---- 导出缓存（优化：避免每次 rerun 重复生成 PDF/ZIP；候选人数变化时自动失效）----
+@st.cache_data(show_spinner=False)
+def _cached_pdf(md: str) -> bytes:
+    return markdown_to_pdf_bytes(md, title_from_markdown(md))
+
+
+@st.cache_data(show_spinner=False)
+def _cached_package(job_id: int, fmt: str, n_candidates: int) -> bytes:
+    return export_job_package(job_id, fmt)
+
+
+@st.cache_data(show_spinner=False)
+def _ranking_excel_bytes(job_id: int, n_candidates: int) -> bytes:
+    from pathlib import Path
+    return Path(export_ranking(job_id, "excel")).read_bytes()
 
 
 # ----------------------------- 公共工具 -----------------------------
@@ -213,16 +232,27 @@ elif PAGE.startswith("③"):
                   "main_risk": "主要风险", "next_action": "建议下一步", "application_id": "应用ID"}
         st.dataframe(df.rename(columns=rename), use_container_width=True, hide_index=True)
 
-        cols = st.columns(3)
-        if cols[0].button("⬇️ 导出 Excel"):
-            p = export_ranking(job.id, "excel")
-            st.success(f"已导出：{p}")
-        if cols[1].button("⬇️ 导出 Markdown"):
-            p = export_ranking(job.id, "markdown")
-            st.success(f"已导出：{p}")
-        if cols[2].button("⬇️ 导出 JSON"):
-            p = export_ranking(job.id, "json")
-            st.success(f"已导出：{p}")
+        n_cand = len(df)
+        st.markdown("**导出排序表**")
+        rk_md = build_ranking_markdown(job.id)
+        rc = st.columns(4)
+        rc[0].download_button("⬇️ Excel", _ranking_excel_bytes(job.id, n_cand),
+                              file_name=f"ranking_job{job.id}.xlsx",
+                              mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        rc[1].download_button("⬇️ PDF", _cached_pdf(rk_md),
+                              file_name=f"ranking_job{job.id}.pdf", mime="application/pdf")
+        rc[2].download_button("⬇️ HTML", markdown_to_html(rk_md, "候选人排序表"),
+                              file_name=f"ranking_job{job.id}.html", mime="text/html")
+        rc[3].download_button("⬇️ Markdown", rk_md, file_name=f"ranking_job{job.id}.md")
+
+        st.markdown("**📦 一键打包导出（排序表 + 全部候选人报告 → ZIP）**")
+        pc1, pc2 = st.columns([1, 2])
+        pkg_fmt = pc1.selectbox("包内格式", ["pdf", "html", "markdown"], key="pkg_fmt")
+        with st.spinner(f"打包 {n_cand} 份报告中……"):
+            pkg = _cached_package(job.id, pkg_fmt, n_cand)
+        pc2.download_button(f"⬇️ 一键导出全部（{n_cand} 人，{pkg_fmt.upper()}）", pkg,
+                            file_name=f"job_{job.id}_reports_{pkg_fmt}.zip",
+                            mime="application/zip", type="primary")
 
         st.divider()
         st.subheader("查看 / 下载单份初筛报告")

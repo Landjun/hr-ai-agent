@@ -111,6 +111,13 @@ def export_ranking(job_id: int, fmt: str = "markdown") -> Path:
 
     # markdown
     path = out_dir / f"ranking_job{job_id}.md"
+    path.write_text(build_ranking_markdown(job_id), encoding="utf-8")
+    return path
+
+
+def build_ranking_markdown(job_id: int) -> str:
+    """构造候选人排序表 Markdown（供导出 / 打包复用）。"""
+    rows = rank_for_job(job_id)
     header = ["排名", "姓名", "总分", "推荐等级", "最高学历", "工作年限",
               "核心技能", "主要优势", "主要风险", "建议下一步"]
     keys = ["rank", "name", "total_score", "level", "highest_education",
@@ -120,8 +127,40 @@ def export_ranking(job_id: int, fmt: str = "markdown") -> Path:
     for r in rows:
         lines.append("| " + " | ".join(str(r.get(k, "")).replace("\n", " ") for k in keys) + " |")
     lines += ["", "*仅供 HR 辅助参考，最终由人工确认。*"]
-    path.write_text("\n".join(lines), encoding="utf-8")
-    return path
+    return "\n".join(lines)
+
+
+def export_job_package(job_id: int, fmt: str = "pdf") -> bytes:
+    """一键打包：把某岗位的排序表 + 全部候选人初筛报告打成一个 ZIP（字节）。
+
+    fmt = pdf / html / markdown，决定包内报告文件格式。
+    """
+    import io
+    import zipfile
+
+    from app.services.report_exporter import (markdown_to_html,
+                                             markdown_to_pdf_bytes,
+                                             title_from_markdown)
+
+    fmt = (fmt or "pdf").lower()
+    ext = {"pdf": "pdf", "html": "html", "markdown": "md", "md": "md"}.get(fmt, "pdf")
+
+    def render(md: str) -> bytes:
+        if ext == "md":
+            return md.encode("utf-8")
+        if ext == "html":
+            return markdown_to_html(md, title_from_markdown(md)).encode("utf-8")
+        return markdown_to_pdf_bytes(md, title_from_markdown(md))
+
+    rows = rank_for_job(job_id)
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr(f"候选人排序表.{ext}", render(build_ranking_markdown(job_id)))
+        for r in rows:
+            md = build_screening_markdown(int(r["application_id"]))
+            safe = "".join(c for c in str(r.get("name", "")) if c.isalnum() or c in "_-") or "候选人"
+            z.writestr(f"reports/{int(r['rank']):02d}_{safe}.{ext}", render(md))
+    return buf.getvalue()
 
 
 def ranking_dataframe(job_id: int):

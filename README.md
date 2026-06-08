@@ -114,6 +114,7 @@ python run.py
 - 排序表：`③ 简历筛选` 页导出按钮，或 API `GET /reports/ranking/{job_id}?fmt=excel`（excel/markdown/json）。
 - 初筛报告：页面一键下载 **Markdown / HTML / PDF**，或 API `GET /reports/screening/{application_id}?fmt=pdf`（markdown/html/pdf）。
 - 面试报告：模拟面试结束后下载 **Markdown / HTML / PDF**，或 API `GET /reports/interview/{session_id}?fmt=pdf`。
+- **一键打包**：`③` 页一个按钮把「排序表 + 全部候选人报告」打成 ZIP（PDF/HTML/Markdown 可选），或 API `GET /reports/package/{job_id}?fmt=pdf`。
 - PDF 用 reportlab 内置 CJK 字体渲染，中文正常、跨平台、无需安装额外字体；HTML 可在浏览器 Ctrl+P 另存为 PDF。
 - 文件默认输出到 `outputs/`。
 

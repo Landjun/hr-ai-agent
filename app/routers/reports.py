@@ -9,7 +9,8 @@ from app.models import InterviewSession
 from app.services.report_exporter import (markdown_to_html, markdown_to_pdf_bytes,
                                           title_from_markdown)
 from app.services.report_generator import (build_screening_markdown,
-                                           export_ranking, save_screening_report)
+                                           export_job_package, export_ranking,
+                                           save_screening_report)
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
@@ -43,6 +44,15 @@ def ranking_export(job_id: int, fmt: str = "markdown"):
     """导出排序表，fmt = markdown / excel / json。"""
     path = export_ranking(job_id, fmt)
     return FileResponse(str(path), filename=path.name)
+
+
+@router.get("/package/{job_id}")
+def package_export(job_id: int, fmt: str = "pdf"):
+    """一键打包：排序表 + 全部候选人初筛报告 → ZIP（fmt = pdf / html / markdown）。"""
+    data = export_job_package(job_id, fmt)
+    return Response(
+        data, media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="job_{job_id}_reports.zip"'})
 
 
 @router.get("/interview/{session_id}")
