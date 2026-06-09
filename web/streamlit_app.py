@@ -251,6 +251,21 @@ elif PAGE.startswith("③"):
 
     job = st.selectbox("选择岗位 JD", jobs, format_func=job_label)
 
+    # 评分规则透明化：明确告诉用户本次用的是哪套规则、各维度满分
+    from app.services.resume_scorer import (get_scoring_dimensions,
+                                           resolve_ruleset_title)
+    _ruleset = resolve_ruleset_title(job.job_title or "通用")
+    _dims = get_scoring_dimensions(job.job_title or "通用")
+    _tag = "岗位专属" if _ruleset != "通用" else "通用"
+    st.info(f"📊 本岗位「{job.job_title}」将套用 **{_ruleset}** 评分规则（{_tag}，"
+            f"{len(_dims)} 个维度，共 {int(sum(d['max_score'] for d in _dims))} 分）。"
+            f"如打分不合预期，多半是 JD 选错——换对岗位即可。", icon="📊")
+    with st.expander("查看本次评分维度"):
+        st.dataframe(
+            pd.DataFrame([{"维度": d["dimension"], "满分": d["max_score"],
+                           "说明": d.get("description", "")} for d in _dims]),
+            use_container_width=True, hide_index=True)
+
     st.subheader("上传 / 粘贴简历")
     files = st.file_uploader("上传简历（支持 PDF / DOCX / TXT / MD，可多选）",
                              type=["pdf", "docx", "txt", "md"], accept_multiple_files=True)

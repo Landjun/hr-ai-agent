@@ -37,6 +37,25 @@
 <!-- ![Screening](docs/screenshots/screening.png) -->
 <!-- ![Interview](docs/screenshots/interview.png) -->
 
+## 🏗️ 架构总览
+
+```mermaid
+flowchart TD
+    JD["JD 文本"] --> P["JD 解析"]
+    R["简历 PDF/DOCX/TXT"] --> FR["文件读取 + 清洗"]
+    FR --> EX["简历抽取（结构化）"]
+    RULE[("评分规则<br/>按岗位自适应")] --> SC
+    P --> SC["逐维度评分 + 结论<br/>（带证据/风险，可并发）"]
+    EX --> SC
+    SC --> RANK["候选人排序"]
+    SC --> REP["报告导出<br/>PDF/Word/HTML/MD/ZIP"]
+    SC -. 复用 JD/简历/评分 .-> PLAN["面试官提纲（模式A）"]
+    SC -. 复用 .-> MOCK["AI 模拟面试（模式B）<br/>一次一问"]
+    MOCK --> IREP["面试报告 + 提升计划"]
+    SC --> DB[("SQLite：jobs / resumes / applications<br/>screening_records / interview_*")]
+    LLM{{"大模型<br/>真实(OpenAI兼容) / 离线Mock 自动切换"}} -.-> P & EX & SC & MOCK
+```
+
 ---
 
 ## 1. 这是什么 / 解决什么问题

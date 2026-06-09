@@ -29,6 +29,25 @@
 - [Per-candidate screening report](docs/examples/screening_report_sample.md)
 - [AI mock-interview report](docs/examples/interview_report_sample.md)
 
+## Architecture
+
+```mermaid
+flowchart TD
+    JD["JD text"] --> P["JD parsing"]
+    R["Resume PDF/DOCX/TXT"] --> FR["File read + clean"]
+    FR --> EX["Resume extraction"]
+    RULE[("Scoring rules<br/>role-adaptive")] --> SC
+    P --> SC["Per-dimension scoring + conclusion<br/>(evidence-based, concurrent)"]
+    EX --> SC
+    SC --> RANK["Candidate ranking"]
+    SC --> REP["Export PDF/Word/HTML/MD/ZIP"]
+    SC -. reuse .-> PLAN["Interviewer guide (mode A)"]
+    SC -. reuse .-> MOCK["AI mock interview (mode B)"]
+    MOCK --> IREP["Interview report"]
+    SC --> DB[("SQLite tables")]
+    LLM{{"LLM: real (OpenAI-compatible) / offline mock"}} -.-> P & EX & SC & MOCK
+```
+
 ## Tech stack
 
 Python 3.10+ · FastAPI · Streamlit · SQLite · SQLModel · Pydantic ·
