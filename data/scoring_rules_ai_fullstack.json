@@ -1,0 +1,15 @@
+{
+  "job_title": "AI全栈工程师",
+  "total_score": 100,
+  "note": "懂开发 + AI Coding + RAG/Agent + 业务集成的全栈型 AI 工程师。路由关键词：AI全栈 / 全栈。",
+  "dimensions": [
+    {"dimension": "全栈开发能力", "max_score": 20, "description": "前后端/API/数据库工程能力，能独立交付完整应用"},
+    {"dimension": "AI应用与大模型", "max_score": 25, "description": "RAG、Agent、LLM 应用、AI Coding/Copilot、Prompt、向量检索与微调"},
+    {"dimension": "业务集成与落地", "max_score": 20, "description": "把 AI 能力集成进业务系统、对接上线、形成可用解决方案"},
+    {"dimension": "项目与成果", "max_score": 20, "description": "从 0 到 1 的 AI 全栈项目、上线效果与量化结果"},
+    {"dimension": "数据与工具", "max_score": 5, "description": "数据处理、知识库构建、工具链使用"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "开源项目、技术博客、个人作品、社区影响力"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

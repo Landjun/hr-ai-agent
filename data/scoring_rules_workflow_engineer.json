@@ -1,0 +1,15 @@
+{
+  "job_title": "工作流工程师",
+  "total_score": 100,
+  "note": "梳理业务流程、沉淀知识与数据结构、搭建自动化工作流。路由关键词：工作流。",
+  "dimensions": [
+    {"dimension": "业务流程梳理能力", "max_score": 25, "description": "把模糊业务梳理成清晰流程/SOP，拆解步骤、标准化"},
+    {"dimension": "知识与数据结构设计", "max_score": 22, "description": "沉淀知识库、设计数据结构/字段/Schema、文档标准化"},
+    {"dimension": "工作流与自动化搭建", "max_score": 20, "description": "用 Coze/Dify/飞书/低代码/RPA 搭建并编排自动化工作流"},
+    {"dimension": "项目与成果", "max_score": 13, "description": "工作流落地项目、效率提升与量化成果"},
+    {"dimension": "工具与技术", "max_score": 10, "description": "AI/大模型、API、低代码、Python 等工具技术能力"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "AI 工作流作品、开源、博客、行业案例"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

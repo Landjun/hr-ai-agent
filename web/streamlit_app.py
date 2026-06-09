@@ -204,13 +204,21 @@ if PAGE.startswith("①"):
 elif PAGE.startswith("②"):
     st.title("JD 管理")
     llm_banner()
-    default_jd = ""
-    sample = ROOT / "data" / "sample_jd.md"
-    if sample.exists():
-        default_jd = sample.read_text(encoding="utf-8")
 
-    jd_text = st.text_area("粘贴 JD 文本", value=default_jd, height=260,
-                           placeholder="把岗位 JD 粘贴到这里……")
+    # 一键选用内置示例 JD（自动对应到岗位评分规则）
+    jd_dir = ROOT / "data" / "jd_samples"
+    samples = sorted(jd_dir.glob("*.md")) if jd_dir.exists() else []
+    options = ["（自己粘贴）"] + [p.stem for p in samples]
+    pick = st.selectbox("🚀 一键选用内置示例 JD（覆盖安全 / AI / 全栈 / FDE / 项目 / 工作流）",
+                        options, help="选择后自动填入下方文本框，点解析即可")
+    if pick != options[0]:
+        default_jd = (jd_dir / f"{pick}.md").read_text(encoding="utf-8")
+    else:
+        sample = ROOT / "data" / "sample_jd.md"
+        default_jd = sample.read_text(encoding="utf-8") if sample.exists() else ""
+
+    jd_text = st.text_area("粘贴 / 编辑 JD 文本", value=default_jd, height=260,
+                           key=f"jdtext_{pick}", placeholder="把岗位 JD 粘贴到这里……")
     if st.button("🔍 解析 JD", type="primary"):
         if not jd_text.strip():
             st.warning("请先粘贴 JD")
@@ -577,6 +585,7 @@ elif PAGE.startswith("⑦"):
     st.divider()
     st.markdown("**如何新增一个岗位规则？** 在 `data/` 放一个 `scoring_rules_<岗位>.json`"
                 "（含 `job_title` 和 `dimensions`），重启即自动入库。")
-    st.caption("已内置 15 套：通用、网络安全渗透测试工程师、AI安全工程师、安全运营工程师、"
-               "安全研究员、大模型应用开发工程师、算法工程师、NLP工程师、计算机视觉工程师、"
-               "MLOps工程师、数据科学家、数据分析师、后端开发工程师、AI产品经理、医疗AI产品经理。")
+    st.caption("已内置 20 套：通用 / 网络安全渗透测试工程师 / 安全开发工程师 / AI安全工程师 / "
+               "安全运营工程师 / 安全研究员 / 大模型应用开发工程师 / AI全栈工程师 / 算法工程师 / "
+               "NLP工程师 / 计算机视觉工程师 / MLOps工程师 / FDE解决方案架构师 / AI项目经理 / "
+               "工作流工程师 / 数据科学家 / 数据分析师 / 后端开发工程师 / AI产品经理 / 医疗AI产品经理。")

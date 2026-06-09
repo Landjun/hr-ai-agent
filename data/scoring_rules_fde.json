@@ -1,0 +1,15 @@
+{
+  "job_title": "FDE解决方案架构师",
+  "total_score": 100,
+  "note": "Forward Deployed Engineer：把客户混乱业务梳理抽象成可执行方案并动手交付。路由关键词：FDE / 解决方案架构 / 解决方案。",
+  "dimensions": [
+    {"dimension": "客户业务理解与抽象", "max_score": 25, "description": "深入客户现场，把混乱、模糊的业务梳理抽象成清晰问题与方案"},
+    {"dimension": "解决方案设计能力", "max_score": 20, "description": "架构与方案设计、技术选型、把需求转化为可落地蓝图"},
+    {"dimension": "技术落地与交付", "max_score": 20, "description": "动手实现、对接集成、POC 到上线的端到端交付能力"},
+    {"dimension": "沟通与项目推动", "max_score": 15, "description": "与客户/内部多方沟通、推动方案落地、管理预期"},
+    {"dimension": "AI与技术广度", "max_score": 10, "description": "AI/大模型/数据/云/集成等技术广度，能快速选型组合"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "标杆客户案例、行业 know-how、演讲/作品"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

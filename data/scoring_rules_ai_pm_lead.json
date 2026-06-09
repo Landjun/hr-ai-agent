@@ -1,0 +1,15 @@
+{
+  "job_title": "AI项目经理",
+  "total_score": 100,
+  "note": "顶层设计 + 项目管理 + AI 工作流落地。路由关键词：AI项目经理（普通项目经理由通用承接）。",
+  "dimensions": [
+    {"dimension": "AI理解与顶层设计", "max_score": 22, "description": "理解 AI/大模型能力边界，做方案顶层设计与技术规划"},
+    {"dimension": "项目管理能力", "max_score": 25, "description": "计划/风险/资源/里程碑管理、敏捷、按时高质量交付"},
+    {"dimension": "AI工作流落地", "max_score": 20, "description": "把 AI 能力落成可运行的工作流/流程自动化（Coze/Dify/飞书等）"},
+    {"dimension": "跨部门协作与推动", "max_score": 15, "description": "协调算法/研发/业务/客户，推动项目落地"},
+    {"dimension": "业务理解", "max_score": 8, "description": "理解业务场景与目标，确保项目对齐业务价值"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "PMP 等证书、标杆项目、技术背景、作品"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

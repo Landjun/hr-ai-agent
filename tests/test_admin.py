@@ -52,6 +52,12 @@ def test_ruleset_routing_and_edit():
     assert resolve_ruleset_title("AI高级产品经理") == "AI产品经理"  # 通用 AI PM
     assert resolve_ruleset_title("Java后端开发工程师") == "后端开发工程师"
     assert resolve_ruleset_title("Go 工程师") == "通用"  # 无具体匹配 → 通用
+    # 新增岗位
+    assert resolve_ruleset_title("资深安全开发工程师") == "安全开发工程师"
+    assert resolve_ruleset_title("AI全栈开发工程师") == "AI全栈工程师"
+    assert resolve_ruleset_title("FDE 解决方案架构师") == "FDE解决方案架构师"
+    assert resolve_ruleset_title("资深AI项目经理") == "AI项目经理"
+    assert resolve_ruleset_title("业务工作流工程师") == "工作流工程师"
 
     # 编辑满分立即生效
     rules = get_ruleset("算法工程师")

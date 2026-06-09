@@ -1,0 +1,15 @@
+{
+  "job_title": "安全开发工程师",
+  "total_score": 100,
+  "note": "DevSecOps / 安全研发：用攻防视角写安全的代码、建安全工具与平台。路由关键词：安全开发。",
+  "dimensions": [
+    {"dimension": "安全编码与攻防理解", "max_score": 20, "description": "安全编码、SDL、漏洞原理、威胁建模、代码审计、以攻防视角设计防护"},
+    {"dimension": "研发与工程能力", "max_score": 25, "description": "Java/Go/Python 工程能力、后端/API/微服务、扎实的开发功底"},
+    {"dimension": "安全工具与平台建设", "max_score": 20, "description": "SAST/DAST、扫描器、安全平台/中台建设、自动化安全工具开发"},
+    {"dimension": "项目与成果", "max_score": 20, "description": "安全研发项目、上线效果、漏洞收敛/效率提升等量化成果"},
+    {"dimension": "安全合规与体系", "max_score": 5, "description": "SDL 流程、等保/合规、安全制度落地"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "安全证书、CTF、开源安全工具、议题/博客"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}
