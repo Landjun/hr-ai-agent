@@ -248,4 +248,5 @@ pytest -q
 如何为接入飞书/Coze 预留架构。
 
 📣 **完整讲解稿**（电梯演讲 / 3 分钟结构 / 高频问题参考答案 / 简历写法）：
-[docs/interview_pitch.md](docs/interview_pitch.md)；设计细节见 [docs/case_study.md](docs/case_study.md)。
+[docs/interview_pitch.md](docs/interview_pitch.md)；设计细节见 [docs/case_study.md](docs/case_study.md)；
+**项目复盘与踩坑沉淀**：[docs/retrospective.md](docs/retrospective.md)。
