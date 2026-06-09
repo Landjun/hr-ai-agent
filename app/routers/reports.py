@@ -6,8 +6,10 @@ from fastapi.responses import FileResponse, PlainTextResponse, Response
 
 from app.database import session_scope
 from app.models import InterviewSession
-from app.services.report_exporter import (markdown_to_html, markdown_to_pdf_bytes,
-                                          title_from_markdown)
+from app.services.report_exporter import (markdown_to_docx_bytes, markdown_to_html,
+                                          markdown_to_pdf_bytes, title_from_markdown)
+
+_DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 from app.services.report_generator import (build_screening_markdown,
                                            export_job_package, export_ranking,
                                            save_screening_report)
@@ -27,7 +29,11 @@ def _render(md: str, fmt: str, filename: str):
         return Response(
             markdown_to_pdf_bytes(md, title), media_type="application/pdf",
             headers={"Content-Disposition": f'attachment; filename="{filename}.pdf"'})
-    raise HTTPException(400, "fmt 仅支持 markdown / html / pdf")
+    if fmt in ("docx", "word"):
+        return Response(
+            markdown_to_docx_bytes(md, title), media_type=_DOCX_MIME,
+            headers={"Content-Disposition": f'attachment; filename="{filename}.docx"'})
+    raise HTTPException(400, "fmt 仅支持 markdown / html / pdf / docx")
 
 
 @router.get("/screening/{application_id}")

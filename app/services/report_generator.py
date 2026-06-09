@@ -138,18 +138,22 @@ def export_job_package(job_id: int, fmt: str = "pdf") -> bytes:
     import io
     import zipfile
 
-    from app.services.report_exporter import (markdown_to_html,
+    from app.services.report_exporter import (markdown_to_docx_bytes,
+                                             markdown_to_html,
                                              markdown_to_pdf_bytes,
                                              title_from_markdown)
 
     fmt = (fmt or "pdf").lower()
-    ext = {"pdf": "pdf", "html": "html", "markdown": "md", "md": "md"}.get(fmt, "pdf")
+    ext = {"pdf": "pdf", "html": "html", "markdown": "md", "md": "md",
+           "docx": "docx", "word": "docx"}.get(fmt, "pdf")
 
     def render(md: str) -> bytes:
         if ext == "md":
             return md.encode("utf-8")
         if ext == "html":
             return markdown_to_html(md, title_from_markdown(md)).encode("utf-8")
+        if ext == "docx":
+            return markdown_to_docx_bytes(md, title_from_markdown(md))
         return markdown_to_pdf_bytes(md, title_from_markdown(md))
 
     rows = rank_for_job(job_id)

@@ -168,3 +168,75 @@ def title_from_markdown(md: str, default: str = "报告") -> str:
         if line.strip().startswith("# "):
             return line.strip()[2:].strip()
     return default
+
+
+# ---------------------------------------------------------------------------
+# Word (.docx)
+# ---------------------------------------------------------------------------
+def _add_runs(paragraph, text: str) -> None:
+    """把 **加粗** 文本拆成 run 写入段落（python-docx 原生支持中文）。"""
+    for i, part in enumerate(re.split(r"\*\*(.+?)\*\*", text)):
+        if not part:
+            continue
+        run = paragraph.add_run(part)
+        run.bold = (i % 2 == 1)  # 奇数段是 ** 之间的内容
+
+
+def markdown_to_docx_bytes(md: str, title: str = "报告") -> bytes:
+    """把（本系统生成的）报告 Markdown 渲染成 Word 文档字节。"""
+    import docx
+    from docx.shared import Pt
+
+    doc = docx.Document()
+    doc.core_properties.title = title
+    lines = md.replace("\r\n", "\n").split("\n")
+    i = 0
+    while i < len(lines):
+        s = lines[i].strip()
+
+        if s.startswith("|"):  # 表格
+            tbl_rows = []
+            while i < len(lines) and lines[i].strip().startswith("|"):
+                cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
+                if not (cells and all(set(c) <= {"-", ":", " "} and c for c in cells)):
+                    tbl_rows.append(cells)
+                i += 1
+            if tbl_rows:
+                cols = max(len(r) for r in tbl_rows)
+                table = doc.add_table(rows=0, cols=cols)
+                table.style = "Light Grid Accent 1"
+                for ri, row in enumerate(tbl_rows):
+                    cells = table.add_row().cells
+                    for ci in range(cols):
+                        val = row[ci] if ci < len(row) else ""
+                        cells[ci].text = ""
+                        _add_runs(cells[ci].paragraphs[0], val)
+                        if ri == 0:
+                            for run in cells[ci].paragraphs[0].runs:
+                                run.bold = True
+            continue
+
+        if not s:
+            pass
+        elif s.startswith("# "):
+            doc.add_heading(s[2:], level=0)
+        elif s.startswith("## "):
+            doc.add_heading(s[3:], level=1)
+        elif s.startswith("### "):
+            doc.add_heading(s[4:], level=2)
+        elif s.startswith(("- ", "* ")):
+            p = doc.add_paragraph(style="List Bullet")
+            _add_runs(p, s[2:])
+        elif s.startswith(">"):
+            p = doc.add_paragraph()
+            run = p.add_run(s.lstrip("> ").strip())
+            run.italic = True
+        elif set(s) <= {"-", "*", "_"} and len(s) >= 3:
+            pass  # 分隔线忽略
+        else:
+            _add_runs(doc.add_paragraph(), s)
+        i += 1
+
+    buf = io.BytesIO()
+    doc.save(buf)
+    return buf.getvalue()

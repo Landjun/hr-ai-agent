@@ -38,6 +38,13 @@ def test_pdf_export_is_valid_pdf():
     assert len(pdf) > 1000
 
 
+def test_docx_export_is_valid():
+    from app.services.report_exporter import markdown_to_docx_bytes
+    data = markdown_to_docx_bytes(SAMPLE_MD, "测试")
+    assert data[:2] == b"PK"  # docx 是 zip 容器
+    assert len(data) > 1000
+
+
 def test_job_package_zip_contains_reports():
     import io
     import zipfile

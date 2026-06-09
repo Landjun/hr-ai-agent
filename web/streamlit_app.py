@@ -23,9 +23,12 @@ from app.models import Application, Job, Resume  # noqa: E402
 from app.services.interview_agent import (ask_next, finish_mock, start_mock,  # noqa: E402
                                          submit_answer)
 from app.services.interview_planner import generate_plan  # noqa: E402
-from app.services.report_exporter import (markdown_to_html,  # noqa: E402
+from app.services.report_exporter import (markdown_to_docx_bytes,  # noqa: E402
+                                          markdown_to_html,
                                           markdown_to_pdf_bytes,
                                           title_from_markdown)
+
+_DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 from app.services.report_generator import (build_ranking_markdown,  # noqa: E402
                                            build_screening_markdown,
                                            export_job_package, export_ranking,
@@ -170,6 +173,23 @@ if PAGE.startswith("①"):
 4. **⑤ AI 模拟面试**：输入 JD → AI 一次问一个问题面试你 → 生成提升报告。
 """)
 
+    with st.expander("🗑️ 数据管理（清理测试数据，不可恢复）"):
+        from app.services.admin import delete_job, reset_all_data
+        st.caption("删除操作不可恢复；评分规则会保留。")
+        _jobs = list_jobs()
+        if _jobs:
+            dj = st.selectbox("删除某个岗位及其评分/面试记录", _jobs,
+                              format_func=job_label, key="del_job")
+            if st.button("删除该岗位数据"):
+                delete_job(dj.id)
+                st.success(f"已删除岗位 #{dj.id}")
+                st.rerun()
+        confirm = st.checkbox("我确认清空全部数据（岗位/简历/评分/面试）")
+        if st.button("⚠️ 清空全部数据", disabled=not confirm):
+            reset_all_data()
+            st.success("已清空全部数据（评分规则保留）。")
+            st.rerun()
+
 # ============================ ② JD 管理 ============================
 elif PAGE.startswith("②"):
     st.title("JD 管理")
@@ -293,7 +313,7 @@ elif PAGE.startswith("③"):
 
         st.markdown("**📦 一键打包导出（排序表 + 全部候选人报告 → ZIP）**")
         pc1, pc2 = st.columns([1, 2])
-        pkg_fmt = pc1.selectbox("包内格式", ["pdf", "html", "markdown"], key="pkg_fmt")
+        pkg_fmt = pc1.selectbox("包内格式", ["pdf", "docx", "html", "markdown"], key="pkg_fmt")
         with st.spinner(f"打包 {n_cand} 份报告中……"):
             pkg = _cached_package(job.id, pkg_fmt, n_cand)
         pc2.download_button(f"⬇️ 一键导出全部（{n_cand} 人，{pkg_fmt.upper()}）", pkg,
@@ -322,12 +342,14 @@ elif PAGE.startswith("③"):
         title = title_from_markdown(md)
         with st.expander("查看完整报告全文"):
             st.markdown(md)
-        d1, d2, d3 = st.columns(3)
-        d1.download_button("⬇️ Markdown", md, file_name=f"screening_{app_id}.md")
-        d2.download_button("⬇️ HTML", markdown_to_html(md, title),
-                           file_name=f"screening_{app_id}.html", mime="text/html")
-        d3.download_button("⬇️ PDF", markdown_to_pdf_bytes(md, title),
+        d1, d2, d3, d4 = st.columns(4)
+        d1.download_button("⬇️ PDF", markdown_to_pdf_bytes(md, title),
                            file_name=f"screening_{app_id}.pdf", mime="application/pdf")
+        d2.download_button("⬇️ Word", markdown_to_docx_bytes(md, title),
+                           file_name=f"screening_{app_id}.docx", mime=_DOCX_MIME)
+        d3.download_button("⬇️ HTML", markdown_to_html(md, title),
+                           file_name=f"screening_{app_id}.html", mime="text/html")
+        d4.download_button("⬇️ Markdown", md, file_name=f"screening_{app_id}.md")
     else:
         st.caption("还没有评分结果，先上传简历并点击「解析并评分」。")
 
@@ -473,12 +495,14 @@ elif PAGE.startswith("⑤"):
             _md = rep["report_markdown"]
             _title = title_from_markdown(_md, "JD 模拟面试报告")
             _sid = ss.mock_session_id
-            e1, e2, e3 = st.columns(3)
-            e1.download_button("⬇️ Markdown", _md, file_name=f"interview_{_sid}.md")
-            e2.download_button("⬇️ HTML", markdown_to_html(_md, _title),
-                               file_name=f"interview_{_sid}.html", mime="text/html")
-            e3.download_button("⬇️ PDF", markdown_to_pdf_bytes(_md, _title),
+            e1, e2, e3, e4 = st.columns(4)
+            e1.download_button("⬇️ PDF", markdown_to_pdf_bytes(_md, _title),
                                file_name=f"interview_{_sid}.pdf", mime="application/pdf")
+            e2.download_button("⬇️ Word", markdown_to_docx_bytes(_md, _title),
+                               file_name=f"interview_{_sid}.docx", mime=_DOCX_MIME)
+            e3.download_button("⬇️ HTML", markdown_to_html(_md, _title),
+                               file_name=f"interview_{_sid}.html", mime="text/html")
+            e4.download_button("⬇️ Markdown", _md, file_name=f"interview_{_sid}.md")
             if st.button("🔄 再来一场"):
                 for k in ["mock_session_id", "mock_max", "mock_current_q",
                           "mock_history", "mock_finished", "mock_report"]:
