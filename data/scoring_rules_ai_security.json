@@ -1,0 +1,15 @@
+{
+  "job_title": "AI安全工程师",
+  "total_score": 100,
+  "note": "大模型安全 / AI 红队 / 对抗与数据安全方向。路由关键词：AI安全。",
+  "dimensions": [
+    {"dimension": "AI安全专项", "max_score": 30, "description": "对抗样本/对抗攻击、大模型越狱(jailbreak)、提示词注入、数据投毒、内容安全、AI 红队测试、模型水印"},
+    {"dimension": "安全攻防基础", "max_score": 15, "description": "传统安全基础：Web/应用安全、漏洞原理、抓包与渗透常识"},
+    {"dimension": "算法与AI基础", "max_score": 20, "description": "机器学习/深度学习与大模型原理，能从算法层面理解与防御攻击"},
+    {"dimension": "安全工具与编程", "max_score": 10, "description": "Python 等编程能力，能实现攻击/防御/评测工具与自动化"},
+    {"dimension": "项目与成果", "max_score": 15, "description": "AI 安全相关项目、评测基准、论文/竞赛/上线成果"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "顶会论文、CTF/AI 攻防赛、开源贡献、安全证书"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

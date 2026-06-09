@@ -1,0 +1,15 @@
+{
+  "job_title": "MLOps工程师",
+  "total_score": 100,
+  "note": "MLOps / AI 平台 / 推理基础设施方向。路由关键词：MLOps。",
+  "dimensions": [
+    {"dimension": "工程与落地能力", "max_score": 25, "description": "Python/Go 工程能力、训练/推理 Pipeline、服务化与稳定性"},
+    {"dimension": "平台与基础设施", "max_score": 25, "description": "K8s/容器、CI/CD、监控、推理服务(Triton/vLLM/ONNX)、高可用调度"},
+    {"dimension": "大模型与前沿技术", "max_score": 15, "description": "大模型训练/推理优化、量化/蒸馏、分布式训练"},
+    {"dimension": "项目与成果", "max_score": 20, "description": "平台从 0 到 1、效率/成本/稳定性提升等量化成果"},
+    {"dimension": "数据处理能力", "max_score": 5, "description": "数据管道、特征平台、数据闭环"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "开源贡献、技术博客、相关认证"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

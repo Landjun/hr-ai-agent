@@ -1,0 +1,15 @@
+{
+  "job_title": "AI产品经理",
+  "total_score": 100,
+  "note": "通用 AI 产品经理（非垂直领域）。路由关键词：AI产品经理（医疗类由『医疗AI产品经理』承接）。",
+  "dimensions": [
+    {"dimension": "AI产品能力", "max_score": 25, "description": "AI/大模型产品设计与落地，懂数据/标注/评测，把握 AI 能力边界"},
+    {"dimension": "产品方法论", "max_score": 20, "description": "需求分析、竞品分析、用户研究、PRD、MVP 与数据驱动迭代"},
+    {"dimension": "项目与商业化结果", "max_score": 20, "description": "0 到 1 项目经验、量化结果与商业化落地"},
+    {"dimension": "行业与业务理解", "max_score": 15, "description": "目标行业/业务场景理解与解决方案能力"},
+    {"dimension": "跨部门协作与推动", "max_score": 10, "description": "与算法/研发/运营等协作、推动落地的能力"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "技术背景、专利/论文、个人作品、行业奖项"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

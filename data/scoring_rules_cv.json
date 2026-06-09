@@ -1,0 +1,15 @@
+{
+  "job_title": "计算机视觉工程师",
+  "total_score": 100,
+  "note": "计算机视觉 / CV 方向。路由关键词：计算机视觉。",
+  "dimensions": [
+    {"dimension": "算法与建模", "max_score": 25, "description": "深度学习与 CV 基础、CNN/Transformer、训练调优能力"},
+    {"dimension": "视觉专项能力", "max_score": 20, "description": "目标检测/分割/识别/OCR/3D/多模态等专项，YOLO/OpenCV/Diffusion"},
+    {"dimension": "工程与落地能力", "max_score": 20, "description": "模型部署、推理优化(ONNX/TensorRT)、边缘/服务端上线"},
+    {"dimension": "项目与成果", "max_score": 20, "description": "项目效果、量化指标、论文/竞赛成果"},
+    {"dimension": "数据处理能力", "max_score": 5, "description": "数据采集、标注、增强与清洗"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "顶会论文、竞赛、开源贡献"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

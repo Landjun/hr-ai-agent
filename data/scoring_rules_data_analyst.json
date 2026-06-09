@@ -1,0 +1,15 @@
+{
+  "job_title": "数据分析师",
+  "total_score": 100,
+  "note": "数据分析 / BI 方向。路由关键词：数据分析。",
+  "dimensions": [
+    {"dimension": "数据分析与建模", "max_score": 25, "description": "统计分析、指标体系、A/B 实验、基础建模能力"},
+    {"dimension": "SQL与数据处理", "max_score": 20, "description": "SQL/Hive/Spark、ETL、数仓与数据清洗"},
+    {"dimension": "业务理解与洞察", "max_score": 20, "description": "结合业务定义指标、发现问题、给出可落地洞察"},
+    {"dimension": "可视化与汇报", "max_score": 15, "description": "Tableau/PowerBI/报表看板、数据故事与汇报能力"},
+    {"dimension": "项目与成果", "max_score": 10, "description": "分析项目对业务的实际影响与量化结果"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "Python 分析、竞赛、证书、个人作品"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

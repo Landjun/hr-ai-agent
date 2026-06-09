@@ -1,0 +1,15 @@
+{
+  "job_title": "NLP工程师",
+  "total_score": 100,
+  "note": "自然语言处理方向。路由关键词：NLP。",
+  "dimensions": [
+    {"dimension": "算法与建模", "max_score": 25, "description": "NLP 基础、Transformer/预训练、文本分类/抽取/生成等建模能力"},
+    {"dimension": "大模型与前沿技术", "max_score": 20, "description": "大模型微调、RAG、Prompt、向量检索等前沿应用"},
+    {"dimension": "工程与落地能力", "max_score": 20, "description": "Python 工程、模型训练与部署、推理优化、上线"},
+    {"dimension": "项目与成果", "max_score": 20, "description": "项目效果、量化指标、论文/竞赛成果"},
+    {"dimension": "数据处理能力", "max_score": 5, "description": "语料清洗、标注、数据增强与构建"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "顶会论文、竞赛、开源模型/数据集"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

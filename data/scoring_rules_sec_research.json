@@ -1,0 +1,14 @@
+{
+  "job_title": "安全研究员",
+  "total_score": 100,
+  "note": "漏洞研究 / 逆向 / 二进制方向。路由关键词：安全研究。",
+  "dimensions": [
+    {"dimension": "漏洞挖掘与利用", "max_score": 30, "description": "0day/Nday 挖掘、Fuzzing、代码审计、POC/EXP 编写与利用链构造"},
+    {"dimension": "逆向与二进制", "max_score": 20, "description": "逆向工程、二进制分析、PWN、IDA/调试、汇编与脱壳"},
+    {"dimension": "安全工具与编程", "max_score": 15, "description": "C/C++/Python 等，自研工具与自动化分析能力"},
+    {"dimension": "实战项目与成果", "max_score": 20, "description": "CVE/致谢、顶会议题、SRC 排名、攻防赛战绩"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 10, "description": "顶会议题(BlackHat/DEFCON)、CVE 数量、CTF 战绩、开源研究"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

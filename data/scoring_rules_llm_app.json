@@ -1,0 +1,15 @@
+{
+  "job_title": "大模型应用开发工程师",
+  "total_score": 100,
+  "note": "LLM 应用 / RAG / Agent 开发方向。路由关键词：大模型。",
+  "dimensions": [
+    {"dimension": "大模型与前沿技术", "max_score": 25, "description": "LLM 应用、RAG、Agent、微调(SFT/LoRA)、向量检索、Prompt 工程、推理优化"},
+    {"dimension": "工程与落地能力", "max_score": 25, "description": "Python 工程能力、FastAPI、服务化部署、并发与稳定性、上线落地"},
+    {"dimension": "项目与成果", "max_score": 20, "description": "从 0 到 1 的 AI 应用上线、量化效果、用户/业务指标"},
+    {"dimension": "数据处理能力", "max_score": 10, "description": "数据清洗、知识库构建、评测集与数据闭环"},
+    {"dimension": "产品与业务理解", "max_score": 10, "description": "理解业务场景、把握 AI 能力边界、与产品协作"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "开源项目、技术博客、竞赛、社区影响力"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

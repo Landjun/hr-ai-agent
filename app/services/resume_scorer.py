@@ -13,19 +13,29 @@ from app.schemas import DimensionScore
 from app.utils.json_parser import parse_json
 from app.utils.scoring import clamp_dimension_scores
 
-# 岗位类别关键词：用于「模糊匹配」评分规则，避免要求岗位名一字不差。
-# 越靠前越具体，命中后优先选用。刻意只保留较具体的词，避免「工程师」这类
-# 过宽关键词把通用开发岗误匹配到某个垂直规则。
-ROLE_KEYWORDS = ["产品经理", "项目经理", "算法工程师", "数据分析师",
-                 "运营", "设计师"]
+# 岗位类别关键词（全部小写）：用于「模糊匹配」评分规则，避免岗位名一字不差。
+# 顺序 = 优先级，越靠前越具体。命中后在已有规则里找标题含该词、且**最贴近**的一套。
+ROLE_KEYWORDS = [
+    # 安全
+    "渗透测试", "ai安全", "安全运营", "安全研究", "网络安全",
+    # AI / 数据
+    "mlops", "大模型", "计算机视觉", "nlp", "数据科学", "数据分析",
+    "算法工程师", "数据工程",
+    # 产品（医疗在前，避免通用 AI 产品经理抢走医疗 JD）
+    "医疗", "ai产品经理", "产品经理", "项目经理",
+    # 通用研发 / 职能
+    "后端", "前端", "测试工程师", "运维", "运营", "设计师",
+    # 兜底（最宽，放最后）
+    "安全",
+]
 
 
 def resolve_ruleset_title(job_title: str) -> str:
     """把任意 JD 岗位名解析到一套已存在的评分规则岗位名。
 
     1) 精确命中 → 用它；
-    2) 否则按「岗位类别关键词」模糊匹配（如『AI高级产品经理』→『医疗AI产品经理』，
-       因为都含『产品经理』）；
+    2) 否则按「岗位类别关键词」（大小写无关）模糊匹配，命中多套时取**标题最短**
+       （最贴近、最不啰嗦）的一套；
     3) 都不中 → 回退『通用』。
     """
     job_title = (job_title or "").strip()
@@ -34,12 +44,13 @@ def resolve_ruleset_title(job_title: str) -> str:
             select(ScoringRule.job_title).distinct()).all())
     if job_title in all_titles:
         return job_title
+    jl = job_title.lower()
     custom = [t for t in all_titles if t and t != "通用"]
-    for kw in ROLE_KEYWORDS:  # 已按具体度排序
-        if kw in job_title:
-            for t in custom:
-                if kw in t:
-                    return t
+    for kw in ROLE_KEYWORDS:
+        if kw in jl:
+            cands = [t for t in custom if kw in t.lower()]
+            if cands:
+                return min(cands, key=len)
     return "通用"
 
 

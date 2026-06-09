@@ -39,13 +39,19 @@ def test_ruleset_routing_and_edit():
     from app.services.resume_scorer import resolve_ruleset_title
 
     titles = list_ruleset_titles()
-    assert {"通用", "医疗AI产品经理", "算法工程师"} <= set(titles)
+    assert {"通用", "医疗AI产品经理", "算法工程师", "网络安全渗透测试工程师",
+            "AI安全工程师", "大模型应用开发工程师", "AI产品经理", "后端开发工程师"} <= set(titles)
     assert titles[0] == "通用"  # 通用排最前
 
     # 岗位类别模糊路由
     assert resolve_ruleset_title("机器学习算法工程师") == "算法工程师"
-    assert resolve_ruleset_title("AI 应用工程师（大模型方向）") == "通用"  # 不被误匹配
-    assert resolve_ruleset_title("AI高级产品经理") == "医疗AI产品经理"
+    assert resolve_ruleset_title("高级渗透测试工程师") == "网络安全渗透测试工程师"
+    assert resolve_ruleset_title("大模型AI安全专家") == "AI安全工程师"  # ai安全优先于大模型
+    assert resolve_ruleset_title("AI 应用工程师（大模型方向）") == "大模型应用开发工程师"
+    assert resolve_ruleset_title("医疗AI产品经理") == "医疗AI产品经理"  # 医疗优先
+    assert resolve_ruleset_title("AI高级产品经理") == "AI产品经理"  # 通用 AI PM
+    assert resolve_ruleset_title("Java后端开发工程师") == "后端开发工程师"
+    assert resolve_ruleset_title("Go 工程师") == "通用"  # 无具体匹配 → 通用
 
     # 编辑满分立即生效
     rules = get_ruleset("算法工程师")

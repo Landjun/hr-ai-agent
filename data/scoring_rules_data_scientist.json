@@ -1,0 +1,15 @@
+{
+  "job_title": "数据科学家",
+  "total_score": 100,
+  "note": "数据科学 / 机器学习建模方向。路由关键词：数据科学。",
+  "dimensions": [
+    {"dimension": "数据建模与算法", "max_score": 25, "description": "机器学习建模、回归/分类/预测、特征工程、模型评估"},
+    {"dimension": "数据处理与分析", "max_score": 25, "description": "数据清洗、统计分析、SQL/Spark、可视化"},
+    {"dimension": "业务理解与落地", "max_score": 20, "description": "结合业务场景定义问题、把模型转化为业务价值"},
+    {"dimension": "项目与成果", "max_score": 15, "description": "项目效果、量化指标、A/B 实验、上线成果"},
+    {"dimension": "工具与工程", "max_score": 5, "description": "Python/SQL/Git、工程化与自动化"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "Kaggle 战绩、论文、竞赛、开源"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}

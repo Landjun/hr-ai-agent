@@ -576,4 +576,7 @@ elif PAGE.startswith("⑦"):
 
     st.divider()
     st.markdown("**如何新增一个岗位规则？** 在 `data/` 放一个 `scoring_rules_<岗位>.json`"
-                "（含 `job_title` 和 `dimensions`），重启即自动入库。已内置：通用 / 医疗AI产品经理 / 算法工程师。")
+                "（含 `job_title` 和 `dimensions`），重启即自动入库。")
+    st.caption("已内置 15 套：通用、网络安全渗透测试工程师、AI安全工程师、安全运营工程师、"
+               "安全研究员、大模型应用开发工程师、算法工程师、NLP工程师、计算机视觉工程师、"
+               "MLOps工程师、数据科学家、数据分析师、后端开发工程师、AI产品经理、医疗AI产品经理。")

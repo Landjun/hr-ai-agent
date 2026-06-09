@@ -1,0 +1,15 @@
+{
+  "job_title": "安全运营工程师",
+  "total_score": 100,
+  "note": "蓝队 / SOC / 应急响应方向。路由关键词：安全运营。",
+  "dimensions": [
+    {"dimension": "安全监测与响应", "max_score": 25, "description": "SOC 运营、态势感知、日志分析、入侵检测(IDS/IPS/WAF)、应急响应处置"},
+    {"dimension": "威胁情报与分析", "max_score": 15, "description": "威胁情报运用、攻击溯源、攻击链分析、IOC/APT 研判"},
+    {"dimension": "安全工具与编程", "max_score": 15, "description": "SIEM/SOAR 等平台使用，Python 自动化编排与脚本能力"},
+    {"dimension": "安全合规与体系", "max_score": 15, "description": "等保/ISO27001、安全制度与流程、风控与审计"},
+    {"dimension": "实战项目与成果", "max_score": 20, "description": "重保/护网战绩、应急处置案例、运营指标改善"},
+    {"dimension": "教育背景", "max_score": 5, "description": "学历/院校/专业（仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5, "description": "CISSP/CISP 等证书、护网/HVV 经历、开源贡献"}
+  ],
+  "levels": [{"min": 85, "label": "强烈推荐面试"}, {"min": 70, "label": "建议面试"}, {"min": 60, "label": "备选"}, {"min": 0, "label": "暂不推荐"}]
+}
