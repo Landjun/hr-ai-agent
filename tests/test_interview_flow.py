@@ -1,6 +1,11 @@
 """面试提纲 + AI 模拟面试流程的离线测试。"""
-from app.services.interview_agent import (ask_next, build_transcript,
-                                         finish_mock, start_mock, submit_answer)
+from app.services.interview_agent import (
+    ask_next,
+    build_transcript,
+    finish_mock,
+    start_mock,
+    submit_answer,
+)
 
 JD = "招聘岗位：AI 应用工程师\n要求：精通 Python，掌握 RAG、Agent。"
 

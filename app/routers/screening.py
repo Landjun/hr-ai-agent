@@ -4,8 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import ScoreRequest
-from app.services.screening_agent import (get_application_detail, rank_for_job,
-                                          screen)
+from app.services.screening_agent import get_application_detail, rank_for_job, screen
 
 router = APIRouter(prefix="/screening", tags=["screening"])
 

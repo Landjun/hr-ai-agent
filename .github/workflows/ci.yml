@@ -26,6 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Lint (ruff)
+        run: |
+          pip install ruff
+          ruff check .
+
       - name: Run tests (offline mock mode, no API key needed)
         env:
           LLM_API_KEY: ""

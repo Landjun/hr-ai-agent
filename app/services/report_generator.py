@@ -138,10 +138,12 @@ def export_job_package(job_id: int, fmt: str = "pdf") -> bytes:
     import io
     import zipfile
 
-    from app.services.report_exporter import (markdown_to_docx_bytes,
-                                             markdown_to_html,
-                                             markdown_to_pdf_bytes,
-                                             title_from_markdown)
+    from app.services.report_exporter import (
+        markdown_to_docx_bytes,
+        markdown_to_html,
+        markdown_to_pdf_bytes,
+        title_from_markdown,
+    )
 
     fmt = (fmt or "pdf").lower()
     ext = {"pdf": "pdf", "html": "html", "markdown": "md", "md": "md",

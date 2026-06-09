@@ -4,8 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import MockAnswerRequest, MockStartRequest, PlanRequest
-from app.services.interview_agent import (ask_next, finish_mock, start_mock,
-                                         submit_answer)
+from app.services.interview_agent import ask_next, finish_mock, start_mock, submit_answer
 from app.services.interview_planner import generate_plan
 
 router = APIRouter(prefix="/interviews", tags=["interviews"])

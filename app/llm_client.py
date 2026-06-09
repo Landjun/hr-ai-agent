@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from app.config import settings
 from app import mock_llm
+from app.config import settings
 
 
 class LLMClient:

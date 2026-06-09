@@ -80,8 +80,7 @@ def markdown_to_pdf_bytes(md: str, title: str = "报告") -> bytes:
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.lib.units import mm
-    from reportlab.platypus import (Paragraph, SimpleDocTemplate, Spacer,
-                                    Table, TableStyle)
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
     body = ParagraphStyle("body", fontName=_FONT, fontSize=10.5, leading=16)
     h1 = ParagraphStyle("h1", fontName=_FONT, fontSize=19, leading=24,
@@ -185,7 +184,6 @@ def _add_runs(paragraph, text: str) -> None:
 def markdown_to_docx_bytes(md: str, title: str = "报告") -> bytes:
     """把（本系统生成的）报告 Markdown 渲染成 Word 文档字节。"""
     import docx
-    from docx.shared import Pt
 
     doc = docx.Document()
     doc.core_properties.title = title

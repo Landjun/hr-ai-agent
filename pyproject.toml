@@ -1,0 +1,21 @@
+[project]
+name = "hr-ai-agent"
+version = "0.1.0"
+description = "HR 提效智能体：简历筛选 + AI 面试双智能体（FastAPI + Streamlit + SQLite，OpenAI 兼容，离线可跑）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Landjun" }]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = ["scripts", "outputs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]  # 长行不强制（中文注释易超长）

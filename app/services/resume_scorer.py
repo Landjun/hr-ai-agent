@@ -13,7 +13,6 @@ from app.schemas import DimensionScore
 from app.utils.json_parser import parse_json
 from app.utils.scoring import clamp_dimension_scores
 
-
 # 岗位类别关键词：用于「模糊匹配」评分规则，避免要求岗位名一字不差。
 # 越靠前越具体，命中后优先选用。
 ROLE_KEYWORDS = ["产品经理", "项目经理", "算法工程师", "数据分析师",

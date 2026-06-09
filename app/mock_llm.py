@@ -297,7 +297,6 @@ def _resume_score(payload: Dict[str, Any]) -> str:
 
     resume_text = (resume.get("raw_text", "") or "").lower()
     resume_skills = [s.lower() for s in resume.get("skills", [])]
-    jd_must = jd.get("must_have_requirements", [])
     jd_skills = [s.lower() for s in jd.get("hard_skills", [])]
     jd_keywords = [s.lower() for s in jd.get("keywords", [])] or jd_skills
 

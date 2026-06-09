@@ -6,13 +6,20 @@ from fastapi.responses import FileResponse, PlainTextResponse, Response
 
 from app.database import session_scope
 from app.models import InterviewSession
-from app.services.report_exporter import (markdown_to_docx_bytes, markdown_to_html,
-                                          markdown_to_pdf_bytes, title_from_markdown)
+from app.services.report_exporter import (
+    markdown_to_docx_bytes,
+    markdown_to_html,
+    markdown_to_pdf_bytes,
+    title_from_markdown,
+)
+from app.services.report_generator import (
+    build_screening_markdown,
+    export_job_package,
+    export_ranking,
+    save_screening_report,
+)
 
 _DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-from app.services.report_generator import (build_screening_markdown,
-                                           export_job_package, export_ranking,
-                                           save_screening_report)
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 

@@ -1,10 +1,8 @@
 """医疗AI产品经理 岗位专属评分规则的离线测试。"""
 from pathlib import Path
 
-from sqlmodel import select
-
 from app.database import session_scope
-from app.models import Job, Resume, ScoringRule
+from app.models import Job, Resume
 from app.services.jd_parser import parse_jd
 from app.services.resume_extractor import extract_resume
 from app.services.resume_scorer import get_scoring_dimensions

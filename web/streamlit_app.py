@@ -20,25 +20,35 @@ from app.config import settings  # noqa: E402
 from app.database import engine, init_db  # noqa: E402
 from app.llm_client import get_llm  # noqa: E402
 from app.models import Application, Job, Resume  # noqa: E402
-from app.services.interview_agent import (ask_next, finish_mock, start_mock,  # noqa: E402
-                                         submit_answer)
+from app.services.interview_agent import (  # noqa: E402
+    ask_next,
+    finish_mock,
+    start_mock,
+    submit_answer,
+)
 from app.services.interview_planner import generate_plan  # noqa: E402
-from app.services.report_exporter import (markdown_to_docx_bytes,  # noqa: E402
-                                          markdown_to_html,
-                                          markdown_to_pdf_bytes,
-                                          title_from_markdown)
+from app.services.report_exporter import (  # noqa: E402
+    markdown_to_docx_bytes,
+    markdown_to_html,
+    markdown_to_pdf_bytes,
+    title_from_markdown,
+)
 
 _DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-from app.services.report_generator import (build_ranking_markdown,  # noqa: E402
-                                           build_screening_markdown,
-                                           export_job_package, export_ranking,
-                                           ranking_dataframe)
-from app.services.resume_extractor import extract_resume  # noqa: E402
-from app.services.resume_parser import (parse_resume_bytes,  # noqa: E402
-                                        parse_resume_text)
-from app.services.screening_agent import (get_application_detail,  # noqa: E402
-                                          screen, screen_resumes_concurrently)
 from sqlmodel import Session, func, select  # noqa: E402
+
+from app.services.report_generator import (  # noqa: E402
+    build_ranking_markdown,
+    build_screening_markdown,
+    export_job_package,
+    export_ranking,
+    ranking_dataframe,
+)
+from app.services.resume_parser import parse_resume_bytes, parse_resume_text  # noqa: E402
+from app.services.screening_agent import (  # noqa: E402
+    get_application_detail,
+    screen_resumes_concurrently,
+)
 
 st.set_page_config(page_title="HR 提效智能体", page_icon="🧑‍💼", layout="wide")
 init_db()
@@ -107,8 +117,8 @@ def level_badge_html(level: str) -> str:
 def llm_banner():
     llm = get_llm()
     if settings.offline_mode:
-        st.info(f"🤖 当前为**离线 Mock 模式**（未配置 API Key），用内置规则模拟大模型，"
-                f"流程完整可演示。配置 `.env` 中 `LLM_API_KEY` 即可切换真实大模型。", icon="ℹ️")
+        st.info("🤖 当前为**离线 Mock 模式**（未配置 API Key），用内置规则模拟大模型，"
+                "流程完整可演示。配置 `.env` 中 `LLM_API_KEY` 即可切换真实大模型。", icon="ℹ️")
     else:
         st.success(f"🤖 已接入真实大模型：{llm.mode}", icon="✅")
     if getattr(llm, "last_error", None):
@@ -252,8 +262,7 @@ elif PAGE.startswith("③"):
     job = st.selectbox("选择岗位 JD", jobs, format_func=job_label)
 
     # 评分规则透明化：明确告诉用户本次用的是哪套规则、各维度满分
-    from app.services.resume_scorer import (get_scoring_dimensions,
-                                           resolve_ruleset_title)
+    from app.services.resume_scorer import get_scoring_dimensions, resolve_ruleset_title
     _ruleset = resolve_ruleset_title(job.job_title or "通用")
     _dims = get_scoring_dimensions(job.job_title or "通用")
     _tag = "岗位专属" if _ruleset != "通用" else "通用"
@@ -307,7 +316,7 @@ elif PAGE.startswith("③"):
                   "main_risk": "主要风险", "next_action": "建议下一步", "application_id": "应用ID"}
         df_disp = df.rename(columns=rename).copy()
         df_disp["推荐等级"] = df_disp["推荐等级"].map(
-            lambda l: f"{LEVEL_STYLE.get(l, ('⚪',))[0]} {l}")
+            lambda lv: f"{LEVEL_STYLE.get(lv, ('⚪',))[0]} {lv}")
         st.dataframe(
             df_disp, use_container_width=True, hide_index=True,
             column_config={"总分": st.column_config.ProgressColumn(

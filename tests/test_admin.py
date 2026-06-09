@@ -2,7 +2,7 @@
 from sqlmodel import func, select
 
 from app.database import session_scope
-from app.models import Application, Job, Resume, ScreeningRecord, ScoringRule
+from app.models import Application, Job, Resume, ScoringRule, ScreeningRecord
 from app.services.admin import delete_job, reset_all_data
 from app.services.screening_agent import screen
 
@@ -12,7 +12,9 @@ def _seed_one():
         job = Job(job_title="通用", jd_text="x", hard_skills=["python"], keywords=["python"])
         r = Resume(candidate_name="甲", raw_text="熟悉 Python",
                    structured_json={"name": "甲", "skills": ["python"], "raw_text": "熟悉 Python"})
-        s.add(job); s.add(r); s.flush()
+        s.add(job)
+        s.add(r)
+        s.flush()
         jid, rid = job.id, r.id
     screen(jid, rid)
     return jid

@@ -4,8 +4,7 @@ from __future__ import annotations
 from sqlmodel import delete, select
 
 from app.database import session_scope
-from app.models import (Application, InterviewMessage, InterviewSession, Job,
-                        Resume, ScreeningRecord)
+from app.models import Application, InterviewMessage, InterviewSession, Job, Resume, ScreeningRecord
 
 
 def reset_all_data() -> None:

@@ -6,9 +6,9 @@ from typing import Iterator
 
 from sqlmodel import Session, SQLModel, create_engine, select
 
+from app import models  # noqa: F401  注册所有表
 from app.config import ROOT_DIR, settings
 from app.models import ScoringRule  # noqa: F401  确保模型被注册
-from app import models  # noqa: F401  注册所有表
 
 # SQLite 需要 check_same_thread=False 以便 FastAPI / Streamlit 多线程访问
 # check_same_thread=False 允许多线程访问；timeout 让并发写时等待锁而不是立刻报错

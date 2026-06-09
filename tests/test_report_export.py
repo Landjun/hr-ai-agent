@@ -1,6 +1,9 @@
 """报告导出（HTML / PDF）离线测试。"""
-from app.services.report_exporter import (markdown_to_html, markdown_to_pdf_bytes,
-                                         title_from_markdown)
+from app.services.report_exporter import (
+    markdown_to_html,
+    markdown_to_pdf_bytes,
+    title_from_markdown,
+)
 
 SAMPLE_MD = """# 候选人初筛报告
 
@@ -60,7 +63,10 @@ def test_job_package_zip_contains_reports():
                     structured_json={"name": "甲", "skills": ["python"], "raw_text": "熟悉 Python"})
         r2 = Resume(candidate_name="乙", raw_text="熟悉 Java",
                     structured_json={"name": "乙", "skills": ["java"], "raw_text": "熟悉 Java"})
-        s.add(job); s.add(r1); s.add(r2); s.flush()
+        s.add(job)
+        s.add(r1)
+        s.add(r2)
+        s.flush()
         jid, r1id, r2id = job.id, r1.id, r2.id
     screen(jid, r1id)
     screen(jid, r2id)

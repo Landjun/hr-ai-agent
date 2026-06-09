@@ -232,4 +232,7 @@ pytest -q
 - 实现一次一问的 AI 模拟面试智能体，含逐轮打分与提升报告。
 
 **面试可讲的亮点**：任务拆分为何提速提质、评分如何可解释、如何防止 AI 越权做录用决定、
-如何为接入飞书/Coze 预留架构。详见 [docs/case_study.md](docs/case_study.md)。
+如何为接入飞书/Coze 预留架构。
+
+📣 **完整讲解稿**（电梯演讲 / 3 分钟结构 / 高频问题参考答案 / 简历写法）：
+[docs/interview_pitch.md](docs/interview_pitch.md)；设计细节见 [docs/case_study.md](docs/case_study.md)。
