@@ -34,6 +34,27 @@ def test_delete_job_removes_related_rows():
         assert s.exec(select(Application).where(Application.job_id == jid)).first() is None
 
 
+def test_ruleset_routing_and_edit():
+    from app.services.admin import get_ruleset, list_ruleset_titles, update_ruleset_scores
+    from app.services.resume_scorer import resolve_ruleset_title
+
+    titles = list_ruleset_titles()
+    assert {"通用", "医疗AI产品经理", "算法工程师"} <= set(titles)
+    assert titles[0] == "通用"  # 通用排最前
+
+    # 岗位类别模糊路由
+    assert resolve_ruleset_title("机器学习算法工程师") == "算法工程师"
+    assert resolve_ruleset_title("AI 应用工程师（大模型方向）") == "通用"  # 不被误匹配
+    assert resolve_ruleset_title("AI高级产品经理") == "医疗AI产品经理"
+
+    # 编辑满分立即生效
+    rules = get_ruleset("算法工程师")
+    d0, base = rules[0]["dimension"], rules[0]["max_score"]
+    update_ruleset_scores("算法工程师", {d0: base + 5})
+    after = {r["dimension"]: r["max_score"] for r in get_ruleset("算法工程师")}
+    assert after[d0] == base + 5
+
+
 def test_reset_keeps_rules_clears_data():
     _seed_one()
     rules_before = _count(ScoringRule)

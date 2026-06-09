@@ -1,0 +1,27 @@
+{
+  "job_title": "算法工程师",
+  "total_score": 100,
+  "note": "面向『算法工程师 / 机器学习工程师 / AI 算法工程师』岗位的专属评分规则。系统按岗位名包含『算法工程师』自动选用。新增岗位规则只需在 data/ 放一个 scoring_rules_xxx.json。",
+  "dimensions": [
+    {"dimension": "算法基础与建模", "max_score": 25,
+     "description": "机器学习/深度学习基础、建模与特征工程能力（PyTorch/TensorFlow/CV/NLP）"},
+    {"dimension": "工程与落地能力", "max_score": 20,
+     "description": "Python/C++ 工程能力、模型部署上线、性能优化、分布式与容器化"},
+    {"dimension": "大模型与前沿技术", "max_score": 15,
+     "description": "大模型/LLM、RAG、微调、Agent、向量检索等前沿技术掌握度"},
+    {"dimension": "项目与成果", "max_score": 20,
+     "description": "项目从 0 到 1、上线效果、量化指标、论文/竞赛成果"},
+    {"dimension": "数据处理能力", "max_score": 5,
+     "description": "数据清洗、特征工程、SQL/Spark/数仓/ETL"},
+    {"dimension": "教育背景", "max_score": 10,
+     "description": "学历/院校/专业（算法岗通常更看重，仅 JD 明确要求时计权）"},
+    {"dimension": "加分项", "max_score": 5,
+     "description": "论文/专利/竞赛(Kaggle 等)/开源贡献"}
+  ],
+  "levels": [
+    {"min": 85, "label": "强烈推荐面试"},
+    {"min": 70, "label": "建议面试"},
+    {"min": 60, "label": "备选"},
+    {"min": 0, "label": "暂不推荐"}
+  ]
+}

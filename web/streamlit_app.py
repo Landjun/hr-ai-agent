@@ -136,7 +136,7 @@ st.sidebar.caption("简历筛选 · 面试官助手 · AI 模拟面试")
 PAGE = st.sidebar.radio(
     "导航",
     ["① 首页 Dashboard", "② JD 管理", "③ 简历筛选",
-     "④ 面试官助手", "⑤ AI 模拟面试", "⑥ 案例沉淀"],
+     "④ 面试官助手", "⑤ AI 模拟面试", "⑥ 案例沉淀", "⑦ 评分规则"],
 )
 st.sidebar.divider()
 st.sidebar.caption(f"大模型模式：{get_llm().mode}")
@@ -541,3 +541,39 @@ elif PAGE.startswith("⑥"):
         st.markdown(doc.read_text(encoding="utf-8"))
     else:
         st.warning("docs/case_study.md 不存在。")
+
+# ============================ ⑦ 评分规则 ============================
+elif PAGE.startswith("⑦"):
+    st.title("评分规则管理")
+    st.caption("评分规则是系统核心：按岗位类别自适应匹配（如任意「…产品经理」用 PM 维度）。"
+               "可在此查看并调整各维度满分，保存后下次评分立即生效。")
+    from app.services.admin import get_ruleset, list_ruleset_titles, update_ruleset_scores
+
+    titles = list_ruleset_titles()
+    rt = st.selectbox("选择岗位规则", titles)
+    rules = get_ruleset(rt)
+    total = sum(r["max_score"] for r in rules)
+    tag = "通用（默认回退）" if rt == "通用" else "岗位专属"
+    st.info(f"「{rt}」（{tag}）共 {len(rules)} 个维度，当前总分 **{int(total)}**（建议合计 100）。",
+            icon="📊")
+    edited = st.data_editor(
+        pd.DataFrame([{"维度": r["dimension"], "满分": float(r["max_score"]),
+                       "说明": r["description"]} for r in rules]),
+        use_container_width=True, hide_index=True, num_rows="fixed",
+        column_config={
+            "维度": st.column_config.TextColumn("维度", disabled=True),
+            "满分": st.column_config.NumberColumn("满分", min_value=0, max_value=100, step=1),
+            "说明": st.column_config.TextColumn("说明", disabled=True),
+        })
+    new_total = float(edited["满分"].sum())
+    note = "" if abs(new_total - 100) < 1e-6 else "（不等于 100，仍可保存，但建议归一到 100）"
+    st.caption(f"调整后合计：{new_total:.0f} 分{note}")
+    if st.button("💾 保存规则", type="primary"):
+        scores = {row["维度"]: float(row["满分"]) for _, row in edited.iterrows()}
+        t = update_ruleset_scores(rt, scores)
+        st.success(f"已保存，「{rt}」总分 {t:.0f}。下次评分立即生效。")
+        st.rerun()
+
+    st.divider()
+    st.markdown("**如何新增一个岗位规则？** 在 `data/` 放一个 `scoring_rules_<岗位>.json`"
+                "（含 `job_title` 和 `dimensions`），重启即自动入库。已内置：通用 / 医疗AI产品经理 / 算法工程师。")
